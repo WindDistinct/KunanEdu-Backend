@@ -1,0 +1,45 @@
+const gradoService = require("../services/grado");
+
+const crear = async (req, res) => {
+  try {
+    const id = await gradoService.insertarGrado(req.body);
+    res.status(201).json({ mensaje: "Grado creado", id });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const listar = async (_req, res) => {
+  try {
+    const grados = await gradoService.obtenerGrados();
+    res.json(grados);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const actualizar = async (req, res) => {
+  try {
+    const cambios = await gradoService.actualizarGrado(req.params.id, req.body);
+    if (cambios === 0) return res.status(404).json({ error: "Grado no encontrado o sin cambios" });
+    res.json({ mensaje: "Grado actualizado" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const eliminar = async (req, res) => {
+  try {
+    const eliminado = await gradoService.eliminarGrado(req.params.id);
+    if (eliminado === 0) return res.status(404).json({ error: "Grado no encontrado" });
+    res.json({ mensaje: "Grado eliminado correctamente" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = {
+  crear,
+  listar,
+  actualizar,
+  eliminar
+};
