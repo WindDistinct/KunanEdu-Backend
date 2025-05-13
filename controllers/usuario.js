@@ -17,7 +17,25 @@ const crear = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+const login = async (req, res) => {  
+  try {
+    const resultado = await usuarioService.loginUsuario(req.body); 
+    if (resultado === null)
+      return res.status(404).json({ error: "Usuario no encontrado" });
 
+    if (resultado === false)
+      return res.status(401).json({ error: "Contraseña incorrecta" });
+
+    res.json({
+      mensaje: "Login exitoso",
+      token: resultado.token,
+      usuario: resultado.usuario,
+      rol: resultado.rol,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 const actualizar = async (req, res) => {
   const { id } = req.params;
   try {
@@ -44,5 +62,5 @@ module.exports = {
     crear,
   listar,
   actualizar,
-  eliminar
+  eliminar,login
 };
