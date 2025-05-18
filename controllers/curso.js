@@ -8,6 +8,14 @@ const listar = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const listarTodo = async (req, res) => {
+  try {
+    const cursos = await cursoService.obtenerTodosLosCursos();
+    res.json(cursos);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
  
 const crear = async (req, res) => {
@@ -43,5 +51,6 @@ module.exports = {
  crear,
   listar,
   actualizar,
-  eliminar
+  eliminar,
+  listarTodo
 };

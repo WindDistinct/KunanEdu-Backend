@@ -21,6 +21,14 @@ const obtenerGrados = () => {
     });
   });
 };
+const obtenerTodosLosGrados = () => {
+  return new Promise((resolve, reject) => {
+    db.all("SELECT * FROM tb_grado", (err, rows) => {
+      if (err) reject(err);
+      else resolve(rows);
+    });
+  });
+};
 
 const actualizarGrado = (id, { nombre_grado, descripcion_grado,estado }) => {
   return new Promise((resolve, reject) => {
@@ -50,5 +58,5 @@ module.exports = {
   insertarGrado,
   obtenerGrados,
   actualizarGrado,
-  eliminarGrado
+  eliminarGrado,obtenerTodosLosGrados
 };

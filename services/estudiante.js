@@ -8,6 +8,14 @@ const listarEstudiantes = () => {
     });
   });
 };
+const listarTodosLosEstudiantes = () => {
+  return new Promise((resolve, reject) => {
+    db.all("select * from tb_alumno", [], (err, rows) => {
+      if (err) return reject(err);
+      resolve(rows);
+    });
+  });
+};
 
  
 const actualizarEstudiante = (id, datos) => {
@@ -107,5 +115,5 @@ const registrarEstudiante = (datos) => {
 };
 
 module.exports = {
-  listarEstudiantes,actualizarEstudiante,eliminarEstudiante,registrarEstudiante
+  listarEstudiantes,actualizarEstudiante,eliminarEstudiante,registrarEstudiante,listarTodosLosEstudiantes
 };

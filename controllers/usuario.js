@@ -8,6 +8,25 @@ const listar = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+const listarTodo = async (req, res) => {
+  try {
+    const usuarios = await usuarioService.obtenerTodosLosUsuario();
+    res.json(usuarios);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+const perfilUsuario  = async (req, res) => {
+  try {
+    const id_usuario = req.user.id;  
+    const perfil = await usuarioService.obtenerPerfil(id_usuario);
+    if (!perfil) {return res.status(404).json({ error: "Usuario no encontrado" });}
+    res.json(perfil);
+    
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 const crear = async (req, res) => {
   try {
@@ -59,8 +78,11 @@ const eliminar = async (req, res) => {
 };
 
 module.exports = {
-    crear,
+  crear,
   listar,
   actualizar,
-  eliminar,login
+  listarTodo,
+  eliminar,
+  login,
+  perfilUsuario 
 };

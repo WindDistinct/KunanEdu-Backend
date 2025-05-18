@@ -8,6 +8,14 @@ const listar = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+const listarTodo = async (req, res) => {
+  try {
+    const cargos = await cargoService.obtenerTodosLosCargos();
+    res.json(cargos);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 
 const crear = async (req, res) => {
   try {
@@ -44,5 +52,6 @@ module.exports = {
   crear,
   listar,
   actualizar,
-  eliminar
+  eliminar,
+  listarTodo
 };

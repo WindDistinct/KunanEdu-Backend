@@ -8,7 +8,14 @@ const obtenerCargos = () => {
     });
   });
 };
-
+const obtenerTodosLosCargos = () => {
+  return new Promise((resolve, reject) => {
+    db.all("SELECT * FROM tb_cargo", [], (err, rows) => {
+      if (err) reject(err);
+      else resolve(rows);
+    });
+  });
+};
 const insertarCargo = (data) => {
   const { nombre_cargo } = data;
   return new Promise((resolve, reject) => {
@@ -41,4 +48,4 @@ const eliminarCargo = (id) => {
   });
 };
 
-module.exports = { obtenerCargos, insertarCargo, actualizarCargo, eliminarCargo };
+module.exports = { obtenerTodosLosCargos,obtenerCargos, insertarCargo, actualizarCargo, eliminarCargo };

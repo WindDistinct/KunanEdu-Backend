@@ -9,6 +9,15 @@ const obtenerEmpleados = () => {
     });
   });
 };
+const obtenerTodosLosEmpleados = () => {
+  const sql = "SELECT * FROM tb_empleado";
+  return new Promise((resolve, reject) => {
+    db.all(sql, [], (err, rows) => {
+      if (err) reject(err);
+      else resolve(rows);
+    });
+  });
+};
 
 const insertarEmpleado = (datos) => {
     const {
@@ -89,5 +98,6 @@ module.exports = {
   obtenerEmpleados,
   insertarEmpleado,
   actualizarEmpleado,
- eliminarEmpleado
+ eliminarEmpleado,
+ obtenerTodosLosEmpleados
 };

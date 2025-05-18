@@ -23,6 +23,16 @@ const obtenerAulas = () => {
     });
   });
 };
+const obtenerTodasLasAulas = () => {
+  const sql = `SELECT * FROM tb_aula`;
+
+  return new Promise((resolve, reject) => {
+    db.all(sql, [], (err, rows) => {
+      if (err) reject(err);
+      else resolve(rows);
+    });
+  });
+};
 
 const actualizarAula = (id, datos) => {
   const { numero_aula, grado, aforo, ubicacion,estado } = datos;
@@ -51,5 +61,6 @@ module.exports = {
   crearAula,
   obtenerAulas,
   actualizarAula,
-  eliminarAula
+  eliminarAula,
+  obtenerTodasLasAulas
 };

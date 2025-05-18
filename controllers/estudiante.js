@@ -10,7 +10,14 @@ const listado = async (req, res) => {
         res.status(500).json({ error: error.message });
       }
 };
-
+const listarTodo = async (req, res) => {
+    try {
+        const estudiantes = await estudianteService.listarTodosLosEstudiantes();
+        res.json(estudiantes);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+};
 const insertar = async (req, res) => {
     const datos = req.body;
   
@@ -47,4 +54,4 @@ const actualizar= async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   };
-module.exports = { listado ,actualizar,eliminar,insertar};
+module.exports = { listado ,actualizar,eliminar,insertar,listarTodo};

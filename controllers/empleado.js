@@ -8,6 +8,14 @@ const listar = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const listarTodo = async (req, res) => {
+  try {
+    const empleados = await empleadoService.obtenerTodosLosEmpleados();
+    res.json(empleados);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 const registrar = async (req, res) => {
   try {
@@ -42,6 +50,7 @@ const eliminar = async (req, res) => {
 
 module.exports = {
   listar,
+  listarTodo,
   registrar,
   actualizar,
   eliminar

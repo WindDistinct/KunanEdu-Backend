@@ -8,6 +8,14 @@ const obtenerCursos = () => {
     });
   });
 };
+const obtenerTodosLosCursos = () => {
+  return new Promise((resolve, reject) => {
+    db.all("SELECT * FROM tb_curso ", [], (err, rows) => {
+      if (err) reject(err);
+      else resolve(rows);
+    });
+  });
+};
 
  
 
@@ -58,4 +66,5 @@ module.exports = {
   insertarCruso,
   actualizarCurso,
   eliminarCurso,
+  obtenerTodosLosCursos
 };
