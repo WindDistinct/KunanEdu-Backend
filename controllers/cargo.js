@@ -19,17 +19,16 @@ const listarTodo = async (req, res) => {
 
 const crear = async (req, res) => {
   try {
-    const nuevoCargo = await cargoService.insertarCargo(req.body);
+    const nuevoCargo = await cargoService.insertarCargo(req.body,req.user);
     res.status(201).json({ mensaje: "Cargo creado", id: nuevoCargo.id });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-const actualizar = async (req, res) => {
-  const { id } = req.params;
+const actualizar = async (req, res) => { 
   try {
-    const actualizado = await cargoService.actualizarCargo(id, req.body);
+    const actualizado = await cargoService.actualizarCargo(req.params.id, req.body,req.user);
     if (actualizado === 0) return res.status(404).json({ error: "No encontrado" });
     res.json({ mensaje: "Cargo actualizado correctamente" });
   } catch (err) {
@@ -37,10 +36,9 @@ const actualizar = async (req, res) => {
   }
 };
 
-const eliminar = async (req, res) => {
-  const { id } = req.params;
+const eliminar = async (req, res) => { 
   try {
-    const eliminado = await cargoService.eliminarCargo(id);
+    const eliminado = await cargoService.eliminarCargo(req.params.id,req.user);
     if (eliminado === 0) return res.status(404).json({ error: "No encontrado" });
     res.json({ mensaje: "Cargo eliminado correctamente" });
   } catch (err) {

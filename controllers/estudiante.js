@@ -18,24 +18,18 @@ const listarTodo = async (req, res) => {
         res.status(500).json({ error: error.message });
       }
 };
-const insertar = async (req, res) => {
-    const datos = req.body;
-  
+const insertar = async (req, res) => { 
     try {
-      const id = await estudianteService.registrarEstudiante(datos);
+      const id = await estudianteService.registrarEstudiante(req.body,req.user);
       res.status(201).json({ mensaje: "Estudiante registrado", id });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   };
   
-const actualizar= async (req, res) => {
-    const { id } = req.params;
-    const datos = req.body;
-
-  
+const actualizar= async (req, res) => { 
     try {
-      const cambios = await estudianteService.actualizarEstudiante(id, datos);
+      const cambios = await estudianteService.actualizarEstudiante(req.params.id, req.body,req.user);
       if (cambios === 0)  return res.status(404).json({ error: "Estudiante no encontrado" });
       res.json({ mensaje: "Estudiante actualizado correctamente" });
     } catch (error) {
@@ -43,11 +37,9 @@ const actualizar= async (req, res) => {
     }
   };
 
-  const eliminar = async (req, res) => {
-    const { id } = req.params;
-  
+  const eliminar = async (req, res) => {  
     try {
-      const cambios = await estudianteService.eliminarEstudiante(id);
+      const cambios = await estudianteService.eliminarEstudiante(req.params.id,req.user);
       if (cambios === 0) return res.status(404).json({ error: "Estudiante no encontrado" });
       res.json({ mensaje: "Estudiante eliminado correctamente" });
     } catch (error) {

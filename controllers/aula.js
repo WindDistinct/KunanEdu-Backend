@@ -2,7 +2,7 @@ const aulaService = require("../services/aula");
 
 const crear = async (req, res) => {
   try {
-    const aula = await aulaService.crearAula(req.body);
+    const aula = await aulaService.crearAula(req.body,req.user);
     res.json({ mensaje: "Aula creada correctamente", aula });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -28,7 +28,7 @@ const listarTodo = async (req, res) => {
 
 const actualizar = async (req, res) => {
   try {
-    const cambios = await aulaService.actualizarAula(req.params.id, req.body);
+    const cambios = await aulaService.actualizarAula(req.params.id, req.body,req.user);
     if (cambios === 0) return res.status(404).json({ error: "Aula no encontrada" });
     res.json({ mensaje: "Aula actualizada correctamente" });
   } catch (error) {
@@ -38,7 +38,7 @@ const actualizar = async (req, res) => {
 
 const eliminar = async (req, res) => {
   try {
-    const cambios = await aulaService.eliminarAula(req.params.id);
+    const cambios = await aulaService.eliminarAula(req.params.id,req.user);
     if (cambios === 0) return res.status(404).json({ error: "Aula no encontrada" });
     res.json({ mensaje: "Aula eliminada correctamente" });
   } catch (error) {

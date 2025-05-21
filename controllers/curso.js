@@ -20,7 +20,7 @@ const listarTodo = async (req, res) => {
  
 const crear = async (req, res) => {
   try {
-    const id = await cursoService.insertarCruso(req.body);
+    const id = await cursoService.insertarCurso(req.body,req.user);
     res.status(201).json({ mensaje: "Curso creado", id });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -29,7 +29,7 @@ const crear = async (req, res) => {
 
 const actualizar = async (req, res) => {
   try {
-    const cambios = await cursoService.actualizarCurso(req.params.id, req.body);
+    const cambios = await cursoService.actualizarCurso(req.params.id, req.body,req.user);
     if (cambios === 0) return res.status(404).json({ error: "Curso no encontrado" });
     res.json({ mensaje: "Curso actualizado" });
   } catch (error) {
@@ -39,7 +39,7 @@ const actualizar = async (req, res) => {
 
 const eliminar = async (req, res) => {
   try {
-    const cambios = await cursoService.eliminarCurso(req.params.id);
+    const cambios = await cursoService.eliminarCurso(req.params.id,req.user);
     if (cambios === 0) return res.status(404).json({ error: "Curso no encontrado" });
     res.json({ mensaje: "Curso eliminado" });
   } catch (error) {

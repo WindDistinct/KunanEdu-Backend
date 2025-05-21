@@ -19,7 +19,7 @@ const listarTodo = async (req, res) => {
 
 const registrar = async (req, res) => {
   try {
-    await empleadoService.insertarEmpleado(req.body);
+    await empleadoService.insertarEmpleado(req.body,req.user);
     res.json({ mensaje: "Empleado registrado correctamente" });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -29,7 +29,7 @@ const registrar = async (req, res) => {
 const actualizar = async (req, res) => {
   const { id } = req.params;
   try {
-    const cambios = await empleadoService.actualizarEmpleado(id, req.body);
+    const cambios = await empleadoService.actualizarEmpleado(id, req.body,req.user);
     if (cambios === 0) return res.status(404).json({ error: "Empleado no encontrado" });
     res.json({ mensaje: "Empleado actualizado correctamente" });
   } catch (error) {
@@ -40,7 +40,7 @@ const actualizar = async (req, res) => {
 const eliminar = async (req, res) => {
   const { id } = req.params;
   try {
-    const cambios = await empleadoService.eliminarEmpleado(id);
+    const cambios = await empleadoService.eliminarEmpleado(id,req.user);
     if (cambios === 0) return res.status(404).json({ error: "Empleado no encontrado" });
     res.json({ mensaje: "Empleado eliminado correctamente" });
   } catch (error) {

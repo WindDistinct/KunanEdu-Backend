@@ -9,6 +9,9 @@ const empleadoRouter = require("./routes/empleado");
 const cursoRouter = require("./routes/curso");
 const aulaRouter = require("./routes/aula");
 const matriculaRouter = require("./routes/matricula");
+const periodoEscolarRouter = require("./routes/periodo");
+const notaRouter = require("./routes/nota");
+
 
 
 
@@ -29,6 +32,9 @@ app.use("/api/empleado", empleadoRouter);
 app.use("/api/curso", cursoRouter);
 app.use("/api/aula", aulaRouter);
 app.use("/api/matricula", matriculaRouter);
+app.use("/api/periodo", periodoEscolarRouter);
+app.use("/api/nota", notaRouter);
+
 
 
 

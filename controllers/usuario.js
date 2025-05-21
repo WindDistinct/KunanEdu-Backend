@@ -29,8 +29,8 @@ const perfilUsuario  = async (req, res) => {
 };
 
 const crear = async (req, res) => {
-  try {
-    const nuevoUsuario = await usuarioService.insertarUsuario(req.body);
+  try { 
+    const nuevoUsuario = await usuarioService.insertarUsuario(req.body,req.user);
     res.status(201).json({ mensaje: "Usuario creado", id: nuevoUsuario.id });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -58,7 +58,7 @@ const login = async (req, res) => {
 const actualizar = async (req, res) => {
   const { id } = req.params;
   try {
-    const actualizado = await usuarioService.actualizarUsuario(id, req.body);
+    const actualizado = await usuarioService.actualizarUsuario(id, req.body,req.user);
     if (actualizado === 0) return res.status(404).json({ error: "Usuario no encontrado" });
     res.json({ mensaje: "Usuario actualizado correctamente" });
   } catch (err) {
@@ -69,7 +69,7 @@ const actualizar = async (req, res) => {
 const eliminar = async (req, res) => {
   const { id } = req.params;
   try {
-    const eliminado = await usuarioService.eliminarUsuario(id);
+    const eliminado = await usuarioService.eliminarUsuario(id,req.user);
     if (eliminado === 0) return res.status(404).json({ error: "Usuario no encontrado" });
     res.json({ mensaje: "Usuario eliminado correctamente" });
   } catch (err) {
