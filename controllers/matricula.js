@@ -35,4 +35,13 @@ const eliminar = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-module.exports = { listado,eliminar,actualizar,listarTodo};
+
+const registrar = async (req, res) => {
+  try {
+    await matriculaService.insertarMatricula(req.body,req.user);
+    res.json({ mensaje: "Matricula registrada correctamente" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+module.exports = { listado,eliminar,actualizar,listarTodo,registrar};

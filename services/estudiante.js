@@ -6,11 +6,9 @@ function registrarAuditoriaAlumno({
   dni_anterior, dni_nuevo,
   apellido_paterno_anterior, apellido_paterno_nuevo,
   apellido_materno_anterior, apellido_materno_nuevo,
-  direccion_anterior, direccion_nueva,
-  grado_anterior, grado_nuevo,
+  direccion_anterior, direccion_nueva, 
   telefono_anterior, telefono_nuevo,
-  fecha_nacimiento_anterior, fecha_nacimiento_nueva,
-  fecha_matricula_anterior, fecha_matricula_nueva,
+  fecha_nacimiento_anterior, fecha_nacimiento_nueva, 
   estado_anterior, estado_nuevo,
   operacion,
   usuario
@@ -24,14 +22,12 @@ function registrarAuditoriaAlumno({
         dni_anterior, dni_nuevo,
         apellido_paterno_anterior, apellido_paterno_nuevo,
         apellido_materno_anterior, apellido_materno_nuevo,
-        direccion_anterior, direccion_nueva,
-        grado_anterior, grado_nuevo,
+        direccion_anterior, direccion_nueva, 
         telefono_anterior, telefono_nuevo,
-        fecha_nacimiento_anterior, fecha_nacimiento_nueva,
-        fecha_matricula_anterior, fecha_matricula_nueva,
+        fecha_nacimiento_anterior, fecha_nacimiento_nueva, 
         estado_anterior, estado_nuevo,
         operacion, fecha_modificacion, usuario_modificador
-      ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const valores = [
@@ -40,11 +36,9 @@ function registrarAuditoriaAlumno({
       dni_anterior, dni_nuevo,
       apellido_paterno_anterior, apellido_paterno_nuevo,
       apellido_materno_anterior, apellido_materno_nuevo,
-      direccion_anterior, direccion_nueva,
-      grado_anterior, grado_nuevo,
+      direccion_anterior, direccion_nueva, 
       telefono_anterior, telefono_nuevo,
-      fecha_nacimiento_anterior, fecha_nacimiento_nueva,
-      fecha_matricula_anterior, fecha_matricula_nueva,
+      fecha_nacimiento_anterior, fecha_nacimiento_nueva, 
       estado_anterior, estado_nuevo,
       operacion, fecha, usuario
     ];
@@ -78,7 +72,7 @@ const listarTodosLosEstudiantes = () => {
 const actualizarEstudiante = (id, datos,usuarioModificador) => { 
     const {
     nombre_alumno, dni_alumno, apellido_paterno, apellido_materno,
-    direccion, grado, telefono, fecha_nacimiento, fecha_matricula, estado
+    direccion, telefono, fecha_nacimiento, estado
   } = datos;
 
   return new Promise((resolve, reject) => {
@@ -91,92 +85,37 @@ const actualizarEstudiante = (id, datos,usuarioModificador) => {
       const sqlUpdate = `
         UPDATE tb_alumno SET
           nombre_alumno = ?, dni_alumno = ?, apellido_paterno = ?, apellido_materno = ?,
-          direccion = ?, grado = ?, telefono = ?, fecha_nacimiento = ?, fecha_matricula = ?, estado = ?
+          direccion = ?, telefono = ?, fecha_nacimiento = ?, estado = ?
         WHERE id_alumno = ?
       `;
         db.run(sqlUpdate, [
         nombre_alumno, dni_alumno, apellido_paterno, apellido_materno,
-        direccion, grado, telefono, fecha_nacimiento, fecha_matricula, estado, id
+        direccion, telefono, fecha_nacimiento, estado, id
       ], function (err2) {
         if (err2) return reject(err2);
- 
-        const sqlMatriculaBuscar = `SELECT * FROM tb_matricula WHERE alumno = ?`;
-
-        db.get(sqlMatriculaBuscar, [id], (err3, matriculaAnterior) => {
-          if (err3) return reject(err3);
-          if (!matriculaAnterior) return reject(new Error('Matrícula no encontrada'));
-
-          const sqlUpdateMatricula = `UPDATE tb_matricula SET fecha_matricula = ? WHERE alumno = ?`;
-
-          db.run(sqlUpdateMatricula, [fecha_matricula, id], function (err4) {
-            if (err4) return reject(err4);
-
-            const fecha_modificacion = new Date().toISOString();
-
-            const sqlAuditMatricula = `
-              INSERT INTO tb_audit_matricula (
-                id_matricula,
-                alumno,
-                fecha_matricula_anterior,
-                fecha_matricula_nueva,
-                observacion_anterior,
-                observacion_nueva,
-                grado_anterior,
-                grado_nuevo,
-                estado_anterior,
-                estado_nuevo,
-                operacion,
-                usuario_modificador,
-                fecha_modificacion
-              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'UPDATE', ?, ?)
-            `;
-
-            db.run(sqlAuditMatricula, [
-              matriculaAnterior.id_matricula,
-              id,
-              matriculaAnterior.fecha_matricula,
-              fecha_matricula,
-              matriculaAnterior.observacion,
-              matriculaAnterior.observacion,  
-              matriculaAnterior.grado,
-              matriculaAnterior.grado,  
-              matriculaAnterior.estado,
-              matriculaAnterior.estado, 
-              usuarioModificador.usuario,
-              fecha_modificacion
-            ], function (err5) {
-              if (err5) return reject(err5);
- 
-              registrarAuditoriaAlumno({
-                id_alumno: id,
-                nombre_anterior: anterior.nombre_alumno,
-                nombre_nuevo: nombre_alumno,
-                dni_anterior: anterior.dni_alumno,
-                dni_nuevo: dni_alumno,
-                apellido_paterno_anterior: anterior.apellido_paterno,
-                apellido_paterno_nuevo: apellido_paterno,
-                apellido_materno_anterior: anterior.apellido_materno,
-                apellido_materno_nuevo: apellido_materno,
-                direccion_anterior: anterior.direccion,
-                direccion_nueva: direccion,
-                grado_anterior: anterior.grado,
-                grado_nuevo: grado,
-                telefono_anterior: anterior.telefono,
-                telefono_nuevo: telefono,
-                fecha_nacimiento_anterior: anterior.fecha_nacimiento,
-                fecha_nacimiento_nueva: fecha_nacimiento,
-                fecha_matricula_anterior: anterior.fecha_matricula,
-                fecha_matricula_nueva: fecha_matricula,
-                estado_anterior: anterior.estado,
-                estado_nuevo: estado,
-                operacion: 'UPDATE',
-                usuario: usuarioModificador.usuario
-              })
-                .then(() => resolve({ mensaje: "Alumno y matrícula actualizados con auditoría" }))
-                .catch(reject);
-            });
-          });
-        });
+          registrarAuditoriaAlumno({
+            id_alumno: id,
+            nombre_anterior: anterior.nombre_alumno,
+            nombre_nuevo: nombre_alumno,
+            dni_anterior: anterior.dni_alumno,
+            dni_nuevo: dni_alumno,
+            apellido_paterno_anterior: anterior.apellido_paterno,
+            apellido_paterno_nuevo: apellido_paterno,
+            apellido_materno_anterior: anterior.apellido_materno,
+            apellido_materno_nuevo: apellido_materno,
+            direccion_anterior: anterior.direccion,
+            direccion_nueva: direccion,
+            telefono_anterior: anterior.telefono,
+            telefono_nuevo: telefono,
+            fecha_nacimiento_anterior: anterior.fecha_nacimiento,
+            fecha_nacimiento_nueva: fecha_nacimiento,
+            estado_anterior: anterior.estado,
+            estado_nuevo: estado,
+            operacion: 'UPDATE',
+            usuario: usuarioModificador.usuario
+          })
+            .then(() => resolve({ mensaje: "Alumno y matrícula actualizados con auditoría" }))
+            .catch(reject);
       });
     });
   });
@@ -207,15 +146,11 @@ const eliminarEstudiante = (id,usuarioModificador) => {
           apellido_materno_anterior: anterior.apellido_materno,
           apellido_materno_nuevo: anterior.apellido_materno,
           direccion_anterior: anterior.direccion,
-          direccion_nueva: anterior.direccion,
-          grado_anterior: anterior.grado,
-          grado_nuevo: anterior.grado,
+          direccion_nueva: anterior.direccion, 
           telefono_anterior: anterior.telefono,
           telefono_nuevo: anterior.telefono,
           fecha_nacimiento_anterior: anterior.fecha_nacimiento,
-          fecha_nacimiento_nueva: anterior.fecha_nacimiento,
-          fecha_matricula_anterior: anterior.fecha_matricula,
-          fecha_matricula_nueva: anterior.fecha_matricula,
+          fecha_nacimiento_nueva: anterior.fecha_nacimiento, 
           estado_anterior: anterior.estado,
           estado_nuevo: 0,
           operacion: 'DELETE',
@@ -234,101 +169,51 @@ const registrarEstudiante = (datos,usuarioModificador) => {
     dni_alumno,
     apellido_paterno,
     apellido_materno,
-    direccion,
-    grado,
+    direccion, 
     telefono,
     fecha_nacimiento
   } = datos;
 
-  const fecha_matricula = new Date().toISOString().split('T')[0];
 
   return new Promise((resolve, reject) => {
     const sqlAlumno = `
       INSERT INTO tb_alumno (
         nombre_alumno, dni_alumno, apellido_paterno, apellido_materno,
-        direccion, grado, telefono, fecha_nacimiento, fecha_matricula, estado
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+        direccion, telefono, fecha_nacimiento, estado
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, 1)
     `;
 
     db.run(sqlAlumno, [
       nombre_alumno, dni_alumno, apellido_paterno, apellido_materno,
-      direccion, grado, telefono, fecha_nacimiento, fecha_matricula
+      direccion, telefono, fecha_nacimiento
     ], function (err) {
       if (err) return reject(err);
 
-      const alumnoId = this.lastID;
-
-      const sqlMatricula = `
-        INSERT INTO tb_matricula (fecha_matricula, observacion, estado, alumno, grado)
-        VALUES (?, ?, ?, ?, ?)
-      `;
-
-      db.run(sqlMatricula, [fecha_matricula, '', 1, alumnoId, grado], function (err2) {
-        if (err2) return reject(err2);
-
-        const matriculaId = this.lastID;
- 
-        const sqlAuditMatricula = `
-          INSERT INTO tb_audit_matricula (
-            id_matricula,
-            alumno,
-            fecha_matricula_anterior,
-            fecha_matricula_nueva,
-            observacion_anterior,
-            observacion_nueva,
-            grado_anterior,
-            grado_nuevo,
-            estado_anterior,
-            estado_nuevo,
-            operacion,
-            usuario_modificador,
-            fecha_modificacion
-          ) VALUES (?, ?, NULL, ?, NULL, ?, NULL, ?, NULL, ?, 'INSERT', ?, ?)
-        `;
-
-        const fecha_modificacion = new Date().toISOString();
-
-        db.run(sqlAuditMatricula, [
-          matriculaId,
-          alumnoId,
-          fecha_matricula,
-          '',
-          grado,
-          1,
-          usuarioModificador.usuario,
-          fecha_modificacion
-        ], function (err3) {
-          if (err3) return reject(err3);
- 
-          registrarAuditoriaAlumno({
-            id_alumno: alumnoId,
-            nombre_anterior: null,
-            nombre_nuevo: nombre_alumno,
-            dni_anterior: null,
-            dni_nuevo: dni_alumno,
-            apellido_paterno_anterior: null,
-            apellido_paterno_nuevo: apellido_paterno,
-            apellido_materno_anterior: null,
-            apellido_materno_nuevo: apellido_materno,
-            direccion_anterior: null,
-            direccion_nueva: direccion,
-            grado_anterior: null,
-            grado_nuevo: grado,
-            telefono_anterior: null,
-            telefono_nuevo: telefono,
-            fecha_nacimiento_anterior: null,
-            fecha_nacimiento_nueva: fecha_nacimiento,
-            fecha_matricula_anterior: null,
-            fecha_matricula_nueva: fecha_matricula,
-            estado_anterior: null,
-            estado_nuevo: 1,
-            operacion: 'INSERT',
-            usuario: usuarioModificador.usuario
-          })
-            .then(() => resolve({ alumnoId, matriculaId }))
-            .catch(reject);
-        });
-      });
+      const alumnoId = this.lastID; 
+      registrarAuditoriaAlumno({
+        id_alumno: alumnoId,
+        nombre_anterior: null,
+        nombre_nuevo: nombre_alumno,
+        dni_anterior: null,
+        dni_nuevo: dni_alumno,
+        apellido_paterno_anterior: null,
+        apellido_paterno_nuevo: apellido_paterno,
+        apellido_materno_anterior: null,
+        apellido_materno_nuevo: apellido_materno,
+        direccion_anterior: null,
+        direccion_nueva: direccion, 
+        telefono_anterior: null,
+        telefono_nuevo: telefono,
+        fecha_nacimiento_anterior: null,
+        fecha_nacimiento_nueva: fecha_nacimiento, 
+        estado_anterior: null,
+        estado_nuevo: 1,
+        operacion: 'INSERT',
+        usuario: usuarioModificador.usuario
+      })
+        .then(() => resolve({ alumnoId }))
+        .catch(reject);
+       
     });
   });
 };
