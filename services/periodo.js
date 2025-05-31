@@ -1,154 +1,198 @@
-const db = require("../database/dbInstance.js");
+const pool = require("../database/db.js");
 
-function registrarAuditoriaPeriodo({
+// Función para registrar auditoría de periodo
+async function registrarAuditoriaPeriodo({
   id_periodo,
   anio_anterior, anio_nuevo,
-  descripcion_anterior, descripcion_nueva,
+  descripcion_anterior, descripcion_nuevo,
+  progreso_anterior, progreso_nuevo,
   estado_anterior, estado_nuevo,
   operacion, usuario
 }) {
-  return new Promise((resolve, reject) => {
-    const fecha = new Date().toISOString();
-    const sqlAudit = `
-      INSERT INTO tb_audit_periodo (
-        id_periodo, anio_anterior, anio_nuevo,
-        descripcion_anterior, descripcion_nueva,
-        estado_anterior, estado_nuevo,
-        operacion, fecha_modificacion, usuario_modificador
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
+  const fecha = new Date().toISOString().split('T')[0]; // yyyy-mm-dd
 
-    db.run(sqlAudit, [
-      id_periodo,
-      anio_anterior, anio_nuevo,
-      descripcion_anterior, descripcion_nueva,
+  const sqlAudit = `
+    INSERT INTO tb_audit_periodo_escolar (
+      id_periodo, anio_anterior, anio_nuevo,
+      descripcion_anterior, descripcion_nuevo,
+      progreso_anterior, progreso_nuevo,
       estado_anterior, estado_nuevo,
-      operacion, fecha, usuario
-    ], function (err) {
-      if (err) return reject(err);
-      resolve();
-    });
-  });
+      operacion, fecha_modificacion, usuario_modificador
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+  `;
+
+  const values = [
+    id_periodo,
+    anio_anterior, anio_nuevo,
+    descripcion_anterior, descripcion_nuevo,
+    progreso_anterior, progreso_nuevo,
+    estado_anterior, estado_nuevo,
+    operacion, fecha, usuario
+  ];
+
+  try {
+    await pool.query(sqlAudit, values);
+    console.log("✔ Auditoría de periodo registrada con éxito.");
+  } catch (err) {
+    console.error("❌ Error al registrar auditoría de periodo:", err);
+    throw err;
+  }
 }
 
-const insertarPeriodo = (datos, usuarioModificador) => {
+// Insertar periodo
+async function insertarPeriodo(datos, usuarioModificador) {
   const { anio, descripcion } = datos;
 
-  return new Promise((resolve, reject) => {
-    const sqlInsert = `
-      INSERT INTO tb_periodo_escolar (anio, descripcion, estado)
-      VALUES (?, ?, 1)
+  const sqlInsert = `
+    INSERT INTO tb_periodo_escolar (anio, descripcion, progreso, estado)
+    VALUES ($1, $2, $3, true)
+    RETURNING id_periodo
+  `;
+
+  try {
+    const result = await pool.query(sqlInsert, [anio, descripcion, progreso]);
+    const id_periodo = result.rows[0].id_periodo;
+
+    await registrarAuditoriaPeriodo({
+      id_periodo,
+      anio_anterior: null,
+      anio_nuevo: anio,
+      descripcion_anterior: null,
+      descripcion_nuevo: descripcion,
+      progreso_anterior: null,
+      progreso_nuevo: progreso,
+      estado_anterior: null,
+      estado_nuevo: true,
+      operacion: 'INSERT',
+      usuario: usuarioModificador.usuario
+    });
+
+    return { mensaje: "Periodo insertado y auditado", id: id_periodo };
+  } catch (err) {
+    console.error("❌ Error al insertar periodo:", err);
+    throw err;
+  }
+}
+
+// Obtener periodos activos
+async function obtenerPeriodos() {
+  const sql = "SELECT * FROM tb_periodo_escolar WHERE estado = true ORDER BY anio DESC";
+  try {
+    const result = await pool.query(sql);
+    return result.rows;
+  } catch (err) {
+    console.error("❌ Error al obtener periodos activos:", err);
+    throw err;
+  }
+}
+
+// Obtener todos los periodos
+async function obtenerTodosLosPeriodos() {
+  const sql = "SELECT * FROM tb_periodo_escolar ORDER BY anio DESC";
+  try {
+    const result = await pool.query(sql);
+    return result.rows;
+  } catch (err) {
+    console.error("❌ Error al obtener todos los periodos:", err);
+    throw err;
+  }
+}
+
+// Actualizar periodo
+async function actualizarPeriodo(id, datos, usuarioModificador) {
+  const { anio, descripcion, progreso, estado } = datos;
+
+  try {
+    const resultAnterior = await pool.query(
+      "SELECT * FROM tb_periodo_escolar WHERE id_periodo = $1",
+      [id]
+    );
+
+    if (resultAnterior.rowCount === 0) {
+      throw new Error("Periodo no encontrado");
+    }
+
+    const anterior = resultAnterior.rows[0];
+
+    const sqlUpdate = `
+      UPDATE tb_periodo_escolar
+      SET anio = $1, descripcion = $2, progreso = $3, estado = $4
+      WHERE id_periodo = $4
     `;
 
-    db.run(sqlInsert, [anio, descripcion], function (err) {
-      if (err) return reject(err);
+    await pool.query(sqlUpdate, [
+      anio,
+      descripcion,
+      progreso,
+      estado,
+      id
+    ]);
 
-      const id_periodo = this.lastID;
-
-      registrarAuditoriaPeriodo({
-        id_periodo,
-        anio_anterior: null,
-        anio_nuevo: anio,
-        descripcion_anterior: null,
-        descripcion_nueva: descripcion,
-        estado_anterior: null,
-        estado_nuevo: 1,
-        operacion: 'INSERT',
-        usuario: usuarioModificador.usuario
-      })
-        .then(() => resolve({ mensaje: "Periodo insertado y auditado", id: id_periodo }))
-        .catch(reject);
+    await registrarAuditoriaPeriodo({
+      id_periodo: id,
+      anio_anterior: anterior.anio,
+      anio_nuevo: anio,
+      descripcion_anterior: anterior.descripcion,
+      descripcion_nuevo: descripcion,
+      progreso_anterior: anterior.progreso,
+      progreso_nuevo: progreso,
+      estado_anterior: anterior.estado,
+      estado_nuevo: estado,
+      operacion: 'UPDATE',
+      usuario: usuarioModificador.usuario
     });
-  });
-};
 
-const obtenerPeriodos = () => {
-  return new Promise((resolve, reject) => {
-    db.all("SELECT * FROM tb_periodo_escolar WHERE estado = 1 ORDER BY anio DESC", (err, rows) => {
-      if (err) reject(err);
-      else resolve(rows);
+    return { mensaje: "Periodo actualizado y auditado" };
+  } catch (err) {
+    console.error("❌ Error al actualizar periodo:", err);
+    throw err;
+  }
+}
+
+// Eliminar periodo (borrado lógico)
+async function eliminarPeriodo(id, usuarioModificador) {
+  try {
+    const resultAnterior = await pool.query(
+      "SELECT * FROM tb_periodo_escolar WHERE id_periodo = $1",
+      [id]
+    );
+
+    if (resultAnterior.rowCount === 0) {
+      throw new Error("Periodo no encontrado");
+    }
+
+    const anterior = resultAnterior.rows[0];
+
+    await pool.query(
+      "UPDATE tb_periodo_escolar SET estado = false WHERE id_periodo = $1",
+      [id]
+    );
+
+    await registrarAuditoriaPeriodo({
+      id_periodo: id,
+      anio_anterior: anterior.anio,
+      anio_nuevo: anterior.anio,
+      descripcion_anterior: anterior.descripcion,
+      descripcion_nuevo: anterior.descripcion,
+      progreso_anterior: anterior.progreso,
+      progreso_nuevo: anterior.progreso,
+      estado_anterior: anterior.estado,
+      estado_nuevo: false,
+      operacion: 'DELETE',
+      usuario: usuarioModificador.usuario
     });
-  });
-};
 
-const obtenerTodosLosPeriodos = () => {
-  return new Promise((resolve, reject) => {
-    db.all("SELECT * FROM tb_periodo_escolar ORDER BY anio DESC", (err, rows) => {
-      if (err) reject(err);
-      else resolve(rows);
-    });
-  });
-};
-const actualizarPeriodo = (id, datos, usuarioModificador) => {
-  const { anio, descripcion, estado } = datos;
+    return { mensaje: "Periodo eliminado (estado = false) y auditado" };
+  } catch (err) {
+    console.error("❌ Error al eliminar periodo:", err);
+    throw err;
+  }
+}
 
-    return new Promise((resolve, reject) => {
-    const sqlBuscar = `SELECT * FROM tb_periodo_escolar WHERE id_periodo = ?`;
-
-    db.get(sqlBuscar, [id], (err, anterior) => {
-      if (err) return reject(err);
-      if (!anterior || Object.keys(anterior).length === 0) return reject(new Error("Periodo no encontrado"));
-
-      const sqlUpdate = `
-        UPDATE tb_periodo_escolar
-        SET anio = ?, descripcion = ?, estado = ?
-        WHERE id_periodo = ?
-      `;
-
-      db.run(sqlUpdate, [anio, descripcion, estado, id], function (err2) {
-        if (err2) return reject(err2);
-
-        registrarAuditoriaPeriodo({
-          id_periodo: id,
-          anio_anterior: anterior.anio,
-          anio_nuevo: anio,
-          descripcion_anterior: anterior.descripcion,
-          descripcion_nueva: descripcion,
-          estado_anterior: anterior.estado,
-          estado_nuevo: estado,
-          operacion: 'UPDATE',
-          usuario: usuarioModificador.usuario
-        })
-          .then(() => resolve({ mensaje: "Periodo actualizado y auditado" }))
-          .catch(reject);
-      });
-    });
-  });
-};
-
-const eliminarPeriodo = (id, usuarioModificador) => {
-  return new Promise((resolve, reject) => {
-    const sqlBuscar = `SELECT * FROM tb_periodo_escolar WHERE id_periodo = ?`;
-
-    db.get(sqlBuscar, [id], (err, anterior) => {
-      if (err) return reject(err);
-      if (!anterior || Object.keys(anterior).length === 0) return reject(new Error("Periodo no encontrado"));
-
-      const sql = `UPDATE tb_periodo_escolar SET estado = 0 WHERE id_periodo = ?`;
-
-      db.run(sql, [id], function (err2) {
-        if (err2) return reject(err2);
-
-        registrarAuditoriaPeriodo({
-          id_periodo: id,
-          anio_anterior: anterior.anio,
-          anio_nuevo: anterior.anio,
-          descripcion_anterior: anterior.descripcion,
-          descripcion_nueva: anterior.descripcion,
-          estado_anterior: anterior.estado,
-          estado_nuevo: 0,
-          operacion: 'DELETE',
-          usuario: usuarioModificador.usuario
-        })
-          .then(() => resolve({ mensaje: "Periodo eliminado (estado = 0) y auditado" }))
-          .catch(reject);
-      });
-    });
-  });
-};
 module.exports = {
   insertarPeriodo,
-  obtenerPeriodos,obtenerTodosLosPeriodos,
+  obtenerPeriodos,
+  obtenerTodosLosPeriodos,
   actualizarPeriodo,
   eliminarPeriodo
 };

@@ -2,7 +2,7 @@ const matriculaService = require("../services/matricula");
 
 const listado = async (req, res) => {
     try {
-        const matriculas = await matriculaService.listarMatricula();
+        const matriculas = await matriculaService.obtenerMatriculas();
         res.json(matriculas);
       } catch (error) {
         res.status(500).json({ error: error.message });
@@ -44,4 +44,4 @@ const registrar = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-module.exports = { listado,eliminar,actualizar,listarTodo,registrar};
+module.exports = { listado,eliminar,actualizar,listarTodo,registrar };

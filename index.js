@@ -1,21 +1,19 @@
 const express = require("express");
 const cors = require("cors");
 
-const estudianteRouter = require("./routes/estudiante");
+const estudianteRouter = require("./routes/alumno");
 const gradoRouter = require("./routes/grado");
-const cargoRouter = require("./routes/cargo");
 const usuarioRouter = require("./routes/usuario");
 const empleadoRouter = require("./routes/empleado");
 const cursoRouter = require("./routes/curso");
 const aulaRouter = require("./routes/aula");
 const matriculaRouter = require("./routes/matricula");
 const periodoEscolarRouter = require("./routes/periodo");
-const notaRouter = require("./routes/nota");
-
-
-
-
-
+const examenRouter = require("./routes/examen");
+const seccionRouter = require("./routes/seccion");
+const seccion_alumnoRouter = require("./routes/seccion_alumno");
+const asistenciaRouter = require("./routes/asistencia");
+const horarioRouter = require("./routes/horario");
 
 
 
@@ -26,21 +24,17 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/estudiante", estudianteRouter);
 app.use("/api/grado", gradoRouter);
-app.use("/api/cargo", cargoRouter);
 app.use("/api/usuario", usuarioRouter);
 app.use("/api/empleado", empleadoRouter);
 app.use("/api/curso", cursoRouter);
 app.use("/api/aula", aulaRouter);
 app.use("/api/matricula", matriculaRouter);
 app.use("/api/periodo", periodoEscolarRouter);
-app.use("/api/nota", notaRouter);
-
-
-
-
-
-
-
+app.use("/api/examen", examenRouter);
+app.use("/api/seccion", seccionRouter);
+app.use("/api/seccion_alumno", seccion_alumnoRouter);
+app.use("/api/asistencia", asistenciaRouter);
+app.use("/api/horario", horarioRouter);
 
 
 module.exports = { app };

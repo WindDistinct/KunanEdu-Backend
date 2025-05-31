@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { listado,actualizar ,eliminar,insertar,listarTodo} = require("../controllers/nota");
+const { listado,actualizar ,eliminar,insertar,listarTodo} = require("../controllers/examen");
 const checkAuth = require("../middleware/session");
 const checkRol = require("../middleware/rol");
 
