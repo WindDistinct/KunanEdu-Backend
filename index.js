@@ -1,5 +1,11 @@
 const express = require("express");
 const cors = require("cors");
+const app = express();
+const port = process.env.PORT || 4000 
+
+app.listen(port, () => {
+  console.log("Servidor activo en el puerto: " + port);
+})
 
 const estudianteRouter = require("./routes/alumno");
 const gradoRouter = require("./routes/grado");
@@ -16,8 +22,6 @@ const asistenciaRouter = require("./routes/asistencia");
 const horarioRouter = require("./routes/horario");
 
 
-
-const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

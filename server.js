@@ -3,12 +3,6 @@ const { app } = require(".");
 const db = require('./database/db.js');
 const { encrypt } = require('./utils/handlePassword.js');
 
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log("Servidor activo en el puerto: " + PORT);
-});
-
 const crearUsuarioInicial = async () => {
   try {
     const passwordHasheado = await encrypt('admin');
