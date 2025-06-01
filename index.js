@@ -52,7 +52,7 @@ cron.schedule("*/10 * * * *", async () => {
 });
 
 app.listen(port, () => {
-  console.log("🚀 Servidor activo en el puerto: " + port);
+  console.log("Servidor activo en el puerto: " + port);
 });
 
 module.exports = { app };
