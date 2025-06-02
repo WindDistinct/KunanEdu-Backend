@@ -5,7 +5,7 @@ const tokensign = async (user) => {
     {
       id: user.id_usuario,
       rol: user.rol,
-      usuario:user.usuario
+      usuario:user.username
     },
     JWT_SECRET,
     {
