@@ -2,7 +2,7 @@ const aulaService = require("../services/aula");
 
 const crear = async (req, res) => {
   try {
-    const aula = await aulaService.crearAula(req.body,req.user);
+    const aula = await aulaService.insertarAula(req.body,req.user);
     res.json({ mensaje: "Aula creada correctamente", aula });
   } catch (error) {
     res.status(500).json({ error: error.message });

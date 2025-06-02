@@ -1,10 +1,10 @@
 
-const estudianteService = require("../services/estudiante");
+const estudianteService = require("../services/alumno");
 
 
 const listado = async (req, res) => {
     try {
-        const estudiantes = await estudianteService.listarEstudiantes();
+        const estudiantes = await estudianteService.obtenerAlumnos();
         res.json(estudiantes);
       } catch (error) {
         res.status(500).json({ error: error.message });
@@ -12,7 +12,7 @@ const listado = async (req, res) => {
 };
 const listarTodo = async (req, res) => {
     try {
-        const estudiantes = await estudianteService.listarTodosLosEstudiantes();
+        const estudiantes = await estudianteService.obtenerTodosLosAlumnos();
         res.json(estudiantes);
       } catch (error) {
         res.status(500).json({ error: error.message });
@@ -20,7 +20,7 @@ const listarTodo = async (req, res) => {
 };
 const insertar = async (req, res) => { 
     try {
-      const id = await estudianteService.registrarEstudiante(req.body,req.user);
+      const id = await estudianteService.insertarAlumno(req.body,req.user);
       res.status(201).json({ mensaje: "Estudiante registrado", id });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -29,7 +29,7 @@ const insertar = async (req, res) => {
   
 const actualizar= async (req, res) => { 
     try {
-      const cambios = await estudianteService.actualizarEstudiante(req.params.id, req.body,req.user);
+      const cambios = await estudianteService.actualizarAlumno(req.params.id, req.body,req.user);
       if (cambios === 0)  return res.status(404).json({ error: "Estudiante no encontrado" });
       res.json({ mensaje: "Estudiante actualizado correctamente" });
     } catch (error) {
@@ -39,7 +39,7 @@ const actualizar= async (req, res) => {
 
   const eliminar = async (req, res) => {  
     try {
-      const cambios = await estudianteService.eliminarEstudiante(req.params.id,req.user);
+      const cambios = await estudianteService.eliminarAlumno(req.params.id,req.user);
       if (cambios === 0) return res.status(404).json({ error: "Estudiante no encontrado" });
       res.json({ mensaje: "Estudiante eliminado correctamente" });
     } catch (error) {

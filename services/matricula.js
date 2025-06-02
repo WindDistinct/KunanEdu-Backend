@@ -1,174 +1,241 @@
-const db = require("../database/dbInstance.js");
+const pool = require("../database/db.js");
 
-function registrarAuditoriaMatricula({
+// Función para registrar auditoría de matrícula
+async function registrarAuditoriaMatricula({
   id_matricula,
+  periodo_anterior, periodo_nuevo,
+  fecha_matricula_anterior, fecha_matricula_nuevo,
+  observacion_anterior, observacion_nuevo,
   alumno_anterior, alumno_nuevo,
   grado_anterior, grado_nuevo,
-  periodo_anterior, periodo_nuevo,
-  fecha_matricula_anterior, fecha_matricula_nueva,
-  observacion_anterior, observacion_nueva,
+  condicion_anterior, condicion_nuevo,
   estado_anterior, estado_nuevo,
-  operacion,
-  usuario
+  operacion, usuario
 }) {
-  return new Promise((resolve, reject) => {
-    const fecha = new Date().toISOString();
-    const sql = `
-      INSERT INTO tb_audit_matricula (
-        id_matricula,
-         alumno_anterior, alumno_nuevo,
-        grado_anterior, grado_nuevo,
-        periodo_anterior, periodo_nuevo,
-        fecha_matricula_anterior, fecha_matricula_nueva,
-        observacion_anterior, observacion_nueva,
-        estado_anterior, estado_nuevo,
-        operacion, fecha_modificacion, usuario_modificador
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?)
-    `;
-    const valores = [
+  const fecha = new Date().toISOString().split('T')[0];
+
+  const sqlAudit = `
+    INSERT INTO tb_audit_matricula (
       id_matricula,
-     alumno_anterior, alumno_nuevo,
-      grado_anterior, grado_nuevo,
       periodo_anterior, periodo_nuevo,
-      fecha_matricula_anterior, fecha_matricula_nueva,
-      observacion_anterior, observacion_nueva,
+      fecha_matricula_anterior, fecha_matricula_nuevo,
+      observacion_anterior, observacion_nuevo,
+      alumno_anterior, alumno_nuevo,
+      grado_anterior, grado_nuevo,
+      condicion_anterior, condicion_nuevo,
       estado_anterior, estado_nuevo,
-      operacion, fecha, usuario
-    ];
-    db.run(sql, valores, err => (err ? reject(err) : resolve()));
-  });
+      operacion, fecha_modificacion, usuario_modificador
+    ) VALUES (
+      $1, $2, $3, $4, $5, $6, $7,
+      $8, $9, $10, $11, $12, $13,
+      $14, $15, $16, $17, $18
+    )
+  `;
+
+  const values = [
+    id_matricula,
+    periodo_anterior, periodo_nuevo,
+    fecha_matricula_anterior, fecha_matricula_nuevo,
+    observacion_anterior, observacion_nuevo,
+    alumno_anterior, alumno_nuevo,
+    grado_anterior, grado_nuevo,
+    condicion_anterior, condicion_nuevo,
+    estado_anterior, estado_nuevo,
+    operacion, fecha, usuario
+  ];
+
+  try {
+    await pool.query(sqlAudit, values);
+    console.log("✔ Auditoría de matrícula registrada con éxito.");
+  } catch (err) {
+    console.error("❌ Error al registrar auditoría de matrícula:", err);
+    throw err;
+  }
 }
 
- 
-const listarMatricula = () => {
-  return new Promise((resolve, reject) => {
-    db.all("SELECT * FROM tb_matricula WHERE estado = 1", (err, rows) => {
-      if (err) reject(err);
-      else resolve(rows);
+// Insertar matrícula
+async function insertarMatricula(datos, usuarioModificador) {
+  const {
+    periodo, fecha_matricula, observacion,
+    alumno, grado, condicion
+  } = datos;
+
+  const sqlInsert = `
+    INSERT INTO tb_matricula (
+      periodo, fecha_matricula, observacion,
+      alumno, grado, condicion, estado
+    ) VALUES (
+      $1, $2, $3, $4, $5, $6, true
+    )
+    RETURNING id_matricula
+  `;
+
+  try {
+    const result = await pool.query(sqlInsert, [
+      periodo, fecha_matricula, observacion,
+      alumno, grado, condicion
+    ]);
+    const id_matricula = result.rows[0].id_matricula;
+
+    await registrarAuditoriaMatricula({
+      id_matricula,
+      periodo_anterior: null,
+      periodo_nuevo: periodo,
+      fecha_matricula_anterior: null,
+      fecha_matricula_nuevo: fecha_matricula,
+      observacion_anterior: null,
+      observacion_nuevo: observacion,
+      alumno_anterior: null,
+      alumno_nuevo: alumno,
+      grado_anterior: null,
+      grado_nuevo: grado,
+      condicion_anterior: null,
+      condicion_nuevo: condicion,
+      estado_anterior: null,
+      estado_nuevo: true,
+      operacion: 'INSERT',
+      usuario: usuarioModificador.usuario
     });
-  });
-};
-const obtenerTodasLasMatriculas = () => {
-  return new Promise((resolve, reject) => {
-    db.all("SELECT * FROM tb_matricula", (err, rows) => {
-      if (err) reject(err);
-      else resolve(rows);
+
+    return { mensaje: "Matrícula insertada y auditada", id: id_matricula };
+  } catch (err) {
+    console.error("❌ Error al insertar matrícula:", err);
+    throw err;
+  }
+}
+
+// Obtener matrículas activas
+async function obtenerMatriculas() {
+  const sql = "SELECT * FROM tb_matricula WHERE estado = true";
+  try {
+    const result = await pool.query(sql);
+    return result.rows;
+  } catch (err) {
+    console.error("❌ Error al obtener matrículas activas:", err);
+    throw err;
+  }
+}
+
+// Obtener todas las matrículas
+async function obtenerTodasLasMatriculas() {
+  const sql = "SELECT * FROM tb_matricula";
+  try {
+    const result = await pool.query(sql);
+    return result.rows;
+  } catch (err) {
+    console.error("❌ Error al obtener todas las matrículas:", err);
+    throw err;
+  }
+}
+
+// Actualizar matrícula
+async function actualizarMatricula(id, datos, usuarioModificador) {
+  const {
+    periodo, fecha_matricula, observacion,
+    alumno, grado, condicion, estado
+  } = datos;
+
+  try {
+    const resultAnterior = await pool.query(
+      "SELECT * FROM tb_matricula WHERE id_matricula = $1",
+      [id]
+    );
+
+    if (resultAnterior.rowCount === 0) {
+      throw new Error("Matrícula no encontrada");
+    }
+
+    const anterior = resultAnterior.rows[0];
+
+    const sqlUpdate = `
+      UPDATE tb_matricula
+      SET periodo = $1, fecha_matricula = $2, observacion = $3,
+          alumno = $4, grado = $5, condicion = $6, estado = $7
+      WHERE id_matricula = $8
+    `;
+
+    await pool.query(sqlUpdate, [
+      periodo, fecha_matricula, observacion,
+      alumno, grado, condicion, estado, id
+    ]);
+
+    await registrarAuditoriaMatricula({
+      id_matricula: id,
+      periodo_anterior: anterior.periodo,
+      periodo_nuevo: periodo,
+      fecha_matricula_anterior: anterior.fecha_matricula,
+      fecha_matricula_nuevo: fecha_matricula,
+      observacion_anterior: anterior.observacion,
+      observacion_nuevo: observacion,
+      alumno_anterior: anterior.alumno,
+      alumno_nuevo: alumno,
+      grado_anterior: anterior.grado,
+      grado_nuevo: grado,
+      condicion_anterior: anterior.condicion,
+      condicion_nuevo: condicion,
+      estado_anterior: anterior.estado,
+      estado_nuevo: estado,
+      operacion: 'UPDATE',
+      usuario: usuarioModificador.usuario
     });
-  });
-};
-const eliminarMatricula = (id, usuarioModificador) => {
-   return new Promise((resolve, reject) => {
-    const sqlSelect = `SELECT * FROM tb_matricula WHERE id_matricula = ?`;
 
-    db.get(sqlSelect, [id], (err, anterior) => {
-      if (err) return reject(err);
-      if (!anterior) return reject(new Error("Matrícula no encontrada"));
+    return { mensaje: "Matrícula actualizada y auditada" };
+  } catch (err) {
+    console.error("❌ Error al actualizar matrícula:", err);
+    throw err;
+  }
+}
 
-      const sqlUpdate = `UPDATE tb_matricula SET estado = 0 WHERE id_matricula = ?`;
+// Eliminar matrícula (borrado lógico)
+async function eliminarMatricula(id, usuarioModificador) {
+  try {
+    const resultAnterior = await pool.query(
+      "SELECT * FROM tb_matricula WHERE id_matricula = $1",
+      [id]
+    );
 
-      db.run(sqlUpdate, [id], function (err2) {
-        if (err2) return reject(err2);
+    if (resultAnterior.rowCount === 0) {
+      throw new Error("Matrícula no encontrada");
+    }
 
-        registrarAuditoriaMatricula({
-          id_matricula: id,
-          alumno_anterior: anterior.alumno,
-          alumno_nuevo: anterior.alumno,
-          grado_anterior: anterior.grado,
-          grado_nuevo: anterior.grado,
-          periodo_anterior: anterior.periodo,
-          periodo_nuevo: anterior.periodo,
-          fecha_matricula_anterior: anterior.fecha_matricula,
-          fecha_matricula_nueva: anterior.fecha_matricula,
-          observacion_anterior: anterior.observacion,
-          observacion_nueva: anterior.observacion,
-          estado_anterior: anterior.estado,
-          estado_nuevo: 0,
-          operacion: 'DELETE',
-          usuario: usuarioModificador.usuario
-        })
-        .then(() => resolve({ mensaje: "Matrícula eliminada (lógico)" }))
-        .catch(reject);
-      });
+    const anterior = resultAnterior.rows[0];
+
+    await pool.query(
+      "UPDATE tb_matricula SET estado = false WHERE id_matricula = $1",
+      [id]
+    );
+
+    await registrarAuditoriaMatricula({
+      id_matricula: id,
+      periodo_anterior: anterior.periodo,
+      periodo_nuevo: anterior.periodo,
+      fecha_matricula_anterior: anterior.fecha_matricula,
+      fecha_matricula_nuevo: anterior.fecha_matricula,
+      observacion_anterior: anterior.observacion,
+      observacion_nuevo: anterior.observacion,
+      alumno_anterior: anterior.alumno,
+      alumno_nuevo: anterior.alumno,
+      grado_anterior: anterior.grado,
+      grado_nuevo: anterior.grado,
+      condicion_anterior: anterior.condicion,
+      condicion_nuevo: anterior.condicion,
+      estado_anterior: anterior.estado,
+      estado_nuevo: false,
+      operacion: 'DELETE',
+      usuario: usuarioModificador.usuario
     });
-  });
-};
 
-const actualizarMatricula = (id, datos, usuarioModificador) => {
-  const { fecha_matricula, observacion, estado, alumno, grado, periodo } = datos;
+    return { mensaje: "Matrícula eliminada (estado = false) y auditada" };
+  } catch (err) {
+    console.error("❌ Error al eliminar matrícula:", err);
+    throw err;
+  }
+}
 
-  return new Promise((resolve, reject) => {
-    const sqlBuscar = `SELECT * FROM tb_matricula WHERE id_matricula = ?`;
-
-    db.get(sqlBuscar, [id], (err, anterior) => {
-      if (err) return reject(err);
-      if (!anterior) return reject(new Error("Matrícula no encontrada"));
-
-      const sqlUpdate = `
-        UPDATE tb_matricula SET
-          fecha_matricula = ?, observacion = ?, estado = ?, alumno = ?, grado = ?, periodo = ?
-        WHERE id_matricula = ?
-      `;
-
-      db.run(sqlUpdate, [
-        fecha_matricula, observacion, estado, alumno, grado, periodo, id
-      ], function (err2) {
-        if (err2) return reject(err2);
-
-        registrarAuditoriaMatricula({
-          id_matricula: id,
-          alumno_anterior: anterior.alumno, alumno_nuevo: alumno,
-          grado_anterior: anterior.grado, grado_nuevo: grado,
-          periodo_anterior: anterior.periodo, periodo_nuevo: periodo,
-          fecha_matricula_anterior: anterior.fecha_matricula, fecha_matricula_nueva: fecha_matricula,
-          observacion_anterior: anterior.observacion, observacion_nueva: observacion,
-          estado_anterior: anterior.estado, estado_nuevo: estado,
-          operacion: 'UPDATE',
-          usuario: usuarioModificador.usuario
-        })
-        .then(() => resolve({ mensaje: "Matrícula actualizada con éxito" }))
-        .catch(reject);
-      });
-    });
-  });
-};
-
-const insertarMatricula = (datos, usuarioModificador) => {
-  const { fecha_matricula, observacion, estado, alumno, grado, periodo } = datos;
-
-  return new Promise((resolve, reject) => {
-    const check = `SELECT * FROM tb_matricula WHERE alumno = ? AND grado = ? AND periodo = ?`;
-    db.get(check, [alumno, grado, periodo], (err, existente) => {
-      if (err) return reject(err);
-      if (existente) return reject(new Error('Ya existe matrícula para este alumno en ese grado y periodo.'));
-
-      const sql = `
-        INSERT INTO tb_matricula (
-          fecha_matricula, observacion, estado, alumno, grado, periodo
-        ) VALUES (?, ?, ?, ?, ?, ?)
-      `;
-
-      db.run(sql, [fecha_matricula, observacion, estado, alumno, grado, periodo], function (err2) {
-        if (err2) return reject(err2);
-
-        const id_matricula = this.lastID;
-
-        registrarAuditoriaMatricula({
-          id_matricula,
-            alumno_anterior: null, alumno_nuevo: alumno,
-          grado_anterior: null, grado_nuevo: grado,
-          periodo_anterior: null, periodo_nuevo: periodo,
-          fecha_matricula_anterior: null, fecha_matricula_nueva: fecha_matricula,
-          observacion_anterior: null, observacion_nueva: observacion,
-          estado_anterior: null, estado_nuevo: estado,
-          operacion: 'INSERT',
-          usuario: usuarioModificador.usuario
-        })
-        .then(() => resolve({ mensaje: "Matrícula registrada correctamente", id_matricula }))
-        .catch(reject);
-      });
-    });
-  });
-};
-module.exports = { 
-  listarMatricula,obtenerTodasLasMatriculas,actualizarMatricula,eliminarMatricula,insertarMatricula
+module.exports = {
+  insertarMatricula,
+  obtenerMatriculas,
+  obtenerTodasLasMatriculas,
+  actualizarMatricula,
+  eliminarMatricula
 };
