@@ -132,7 +132,17 @@ async function obtenerTodosLosAlumnos() {
     throw err;
   }
 }
-
+// Obtener todos los alumnos de la tabla auditoria
+async function obtenerTodosLosAlumnosAudit() {
+  const sql = "SELECT * FROM tb_audit_alumno";
+  try {
+    const result = await pool.query(sql);
+    return result.rows;
+  } catch (err) {
+    console.error("❌ Error al obtener todos los alumnos de auditoria:", err);
+    throw err;
+  }
+}
 // Actualizar alumno
 async function actualizarAlumno(id, datos, usuarioModificador) {
   const {
@@ -248,5 +258,6 @@ module.exports = {
   obtenerAlumnos,
   obtenerTodosLosAlumnos,
   actualizarAlumno,
-  eliminarAlumno
+  eliminarAlumno,
+  obtenerTodosLosAlumnosAudit
 };

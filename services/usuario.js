@@ -172,7 +172,7 @@ async function actualizarUsuario(id, datos, usuarioModificador) {
       rol_anterior: anterior.rol,
       rol_nuevo: rol,
       operacion: 'UPDATE',
-      usuario_modificador: usuarioModificador.username
+      usuario_modificador: usuarioModificador.usuario
     });
 
     return { mensaje: "Usuario actualizado y auditado" };
@@ -212,7 +212,7 @@ async function eliminarUsuario(id, usuarioModificador) {
       rol_anterior: anterior.rol,
       rol_nuevo: anterior.rol,
       operacion: 'DELETE',
-      usuario_modificador: usuarioModificador.username
+      usuario_modificador: usuarioModificador.usuario
     });
 
     return { mensaje: "Usuario eliminado y auditado" };

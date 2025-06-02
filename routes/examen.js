@@ -6,8 +6,8 @@ const checkRol = require("../middleware/rol");
 
 router.get("/all", listado);  
 router.get("/all-adm", listarTodo);
-router.delete("/delete/:id",checkAuth,checkRol('PROFESOR'),eliminar)
-router.put("/update/:id",checkAuth,checkRol('PROFESOR'),actualizar)
-router.post("/create", checkAuth,checkRol('PROFESOR'),insertar);
+router.delete("/delete/:id",checkAuth,checkRol('profesor'),eliminar)
+router.put("/update/:id",checkAuth,checkRol('profesor'),actualizar)
+router.post("/create", checkAuth,checkRol('profesor'),insertar);
 
 module.exports = router;
