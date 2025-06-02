@@ -98,7 +98,7 @@ async function insertarUsuario(datos, usuarioModificador) {
       rol_anterior: null,
       rol_nuevo: rol,
       operacion: 'INSERT',
-      usuario_modificador: usuarioModificador.username
+      usuario_modificador: usuarioModificador.usuario
     });
 
     return { mensaje: 'Usuario registrado y auditado' };
