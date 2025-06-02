@@ -9,6 +9,6 @@ router.get("/all", listado);
 router.get("/all-adm", listarTodo);
 router.delete("/delete/:id",checkAuth,eliminar)
 router.put("/update/:id",checkAuth,actualizar)
-router.post("/create", checkAuth,checkRol('ADMIN'),registrar);
+router.post("/create", checkAuth,checkRol('administrador'),registrar);
 
 module.exports = router;

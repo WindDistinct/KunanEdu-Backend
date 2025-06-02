@@ -44,7 +44,7 @@ app.use("/api/horario", horarioRouter);
 // Ping periódico cada 10 minutos a tu propia URL de Render
 cron.schedule("*/10 * * * *", async () => {
   try {
-    const response = await axios.get("https://kunanedu-backend.onrender.com"); 
+    const response = await axios.get("https://kunanedu-backend.onrender.com/api/usuario/all"); 
     console.log("Ping exitoso:", response.status);
   } catch (error) {
     console.error("Error al hacer ping:", error.message);

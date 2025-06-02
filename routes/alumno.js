@@ -7,8 +7,8 @@ const checkRol = require("../middleware/rol");
 
 router.get("/all", listado);
 router.get("/all-adm", listarTodo);
-router.delete("/delete/:id",checkAuth,checkRol('ADMIN'),eliminar)
-router.put("/update/:id",checkAuth,checkRol('ADMIN'),actualizar)
-router.post("/create", checkAuth,checkRol('ADMIN'),insertar);
+router.delete("/delete/:id",checkAuth,checkRol('administrador'),eliminar)
+router.put("/update/:id",checkAuth,checkRol('administrador'),actualizar)
+router.post("/create", checkAuth,checkRol('administrador'),insertar);
 
 module.exports = router;
