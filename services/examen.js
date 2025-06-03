@@ -102,7 +102,17 @@ async function obtenerTodosLosExamenes() {
     throw err;
   }
 }
-
+// Obtener todos los exámenes de auditoria
+async function obtenerTodosLosExamenesAuditoria() {
+  const sql = "SELECT * FROM tb_audit_examen";
+  try {
+    const result = await pool.query(sql);
+    return result.rows;
+  } catch (err) {
+    console.error("❌ Error al obtener todos los exámenes de auditoria:", err);
+    throw err;
+  }
+}
 // Actualizar examen
 async function actualizarExamen(id, datos, usuarioModificador) {
   const { curso, seccion, bimestre, nota, estado } = datos;
@@ -199,5 +209,6 @@ module.exports = {
   obtenerExamenes,
   obtenerTodosLosExamenes,
   actualizarExamen,
-  eliminarExamen
+  eliminarExamen,
+  obtenerTodosLosExamenesAuditoria
 };

@@ -59,7 +59,17 @@ async function obtenerTodosLosCursos() {
     throw err;
   }
 }
-
+// Obtener todos los cursos de auditoria
+async function obtenerTodosLosCursosAuditoria() {
+  const sql = "SELECT * FROM tb_audit_curso";
+  try {
+    const result = await pool.query(sql);
+    return result.rows;
+  } catch (err) {
+    console.error("❌ Error al obtener todos los cursos de auditorias:", err);
+    throw err;
+  }
+}
 // Insertar curso
 async function insertarCurso(datos, usuarioModificador) {
   const { nombre_curso, docente } = datos;
@@ -117,7 +127,6 @@ async function actualizarCurso(id, datos, usuarioModificador) {
 
     await pool.query(sqlUpdate, [
       nombre_curso,
-      grado,
       docente,
       estado,
       id
@@ -187,6 +196,7 @@ module.exports = {
   obtenerCursos,
   obtenerTodosLosCursos,
   insertarCurso,
+  obtenerTodosLosCursosAuditoria,
   actualizarCurso,
   eliminarCurso
 };

@@ -10,8 +10,16 @@ const listado = async (req, res) => {
 };
 const listarTodo = async (_req, res) => {
   try {
-    const grados = await matriculaService.obtenerTodasLasMatriculas();
-    res.json(grados);
+    const matricula = await matriculaService.obtenerTodasLasMatriculas();
+    res.json(matricula);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const listarAuditoria = async (_req, res) => {
+  try {
+    const matricula = await matriculaService.obtenerTodasLasMatriculasAuditoria();
+    res.json(matricula);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -44,4 +52,4 @@ const registrar = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-module.exports = { listado,eliminar,actualizar,listarTodo,registrar };
+module.exports = { listado,eliminar,actualizar,listarAuditoria,listarTodo,registrar };

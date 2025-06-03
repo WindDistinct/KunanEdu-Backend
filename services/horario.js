@@ -114,6 +114,17 @@ async function obtenerTodosLosHorarios() {
     throw err;
   }
 }
+// Obtener todos los horarios de auditoria
+async function obtenerTodosLosHorariosAuditoria() {
+  const sql = "SELECT * FROM tb_audit_horario";
+  try {
+    const result = await pool.query(sql);
+    return result.rows;
+  } catch (err) {
+    console.error("❌ Error al obtener todos los horarios auditoria:", err);
+    throw err;
+  }
+}
 
 // Actualizar horario
 async function actualizarHorario(id, datos, usuarioModificador) {
@@ -215,6 +226,7 @@ module.exports = {
   insertarHorario,
   obtenerHorarios,
   obtenerTodosLosHorarios,
+  obtenerTodosLosHorariosAuditoria,
   actualizarHorario,
   eliminarHorario
 };

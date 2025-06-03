@@ -151,7 +151,17 @@ async function obtenerTodosLosEmpleados() {
     throw err;
   }
 }
-
+// Obtener todos los empleados de auditoria
+async function obtenerTodosLosEmpleadosAuditoria() {
+  const sql = "SELECT * FROM tb_audit_empleado";
+  try {
+    const result = await pool.query(sql);
+    return result.rows;
+  } catch (err) {
+    console.error("❌ Error al obtener todos los empleados:", err);
+    throw err;
+  }
+}
 // Actualizar empleado
 async function actualizarEmpleado(id, datos, usuarioModificador) {
   const {
@@ -278,6 +288,7 @@ async function eliminarEmpleado(id, usuarioModificador) {
 module.exports = {
   insertarEmpleado,
   obtenerEmpleados,
+  obtenerTodosLosEmpleadosAuditoria,
   obtenerTodosLosEmpleados,
   actualizarEmpleado,
   eliminarEmpleado

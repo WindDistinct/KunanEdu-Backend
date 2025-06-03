@@ -11,16 +11,24 @@ const insertar = async (req, res) => {
 
 const listado = async (_req, res) => {
   try {
-    const grados = await examenService.obtenerExamenes();
-    res.json(grados);
+    const examen = await examenService.obtenerExamenes();
+    res.json(examen);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 const listarTodo = async (_req, res) => {
   try {
-    const grados = await examenService.obtenerTodosLosExamenes();
-    res.json(grados);
+    const examen = await examenService.obtenerTodosLosExamenes();
+    res.json(examen);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const listarAuditoria = async (_req, res) => {
+  try {
+    const examen = await examenService.obtenerTodosLosExamenesAuditoria();
+    res.json(examen);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -48,6 +56,7 @@ const eliminar = async (req, res) => {
 module.exports = {
   insertar,
   listado,
+  listarAuditoria,
   actualizar, 
   eliminar,listarTodo
 };

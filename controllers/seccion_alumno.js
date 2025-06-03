@@ -25,6 +25,14 @@ const listarTodo = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const listarAuditoria = async (req, res) => {
+  try {
+    const seccion_alumno = await seccion_alumnoService.obtenerTodasLasSeccionAlumnosAuditoria();
+    res.json(seccion_alumno);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 const actualizar = async (req, res) => {
   try {
@@ -51,5 +59,6 @@ module.exports = {
   listar,
   actualizar,
   eliminar,
+  listarAuditoria,
   listarTodo
 };

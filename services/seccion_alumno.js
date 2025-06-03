@@ -96,7 +96,17 @@ async function obtenerTodasLasSeccionAlumnos() {
     throw err;
   }
 }
-
+// Obtener todas las secciones auditorias
+async function obtenerTodasLasSeccionAlumnosAuditoria() {
+  const sql = "SELECT * FROM tb_audit_seccion_alumno";
+  try {
+    const result = await pool.query(sql);
+    return result.rows;
+  } catch (err) {
+    console.error("❌ Error al obtener todas las relaciones:", err);
+    throw err;
+  }
+}
 // Actualizar relación
 async function actualizarSeccionAlumno(id, datos, usuarioModificador) {
   const { seccion, alumno, estado } = datos;
@@ -180,6 +190,7 @@ async function eliminarSeccionAlumno(id, usuarioModificador) {
 
 module.exports = {
   insertarSeccionAlumno,
+  obtenerTodasLasSeccionAlumnosAuditoria,
   obtenerSeccionAlumnos,
   obtenerTodasLasSeccionAlumnos,
   actualizarSeccionAlumno,

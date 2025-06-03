@@ -16,6 +16,14 @@ const listarTodo = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const listarAuditoria = async (req, res) => {
+  try {
+    const cursos = await cursoService.obtenerTodosLosCursosAuditoria();
+    res.json(cursos);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
  
 const crear = async (req, res) => {
@@ -50,6 +58,7 @@ const eliminar = async (req, res) => {
 module.exports = {
  crear,
   listar,
+  listarAuditoria,
   actualizar,
   eliminar,
   listarTodo

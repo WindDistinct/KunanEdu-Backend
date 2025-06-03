@@ -127,6 +127,17 @@ async function obtenerTodasLasMatriculas() {
     throw err;
   }
 }
+// Obtener todas las matrículas de auditoria
+async function obtenerTodasLasMatriculasAuditoria() {
+  const sql = "SELECT * FROM tb_audit_matricula";
+  try {
+    const result = await pool.query(sql);
+    return result.rows;
+  } catch (err) {
+    console.error("❌ Error al obtener todas las matrículas de auditoria:", err);
+    throw err;
+  }
+}
 
 // Actualizar matrícula
 async function actualizarMatricula(id, datos, usuarioModificador) {
@@ -235,6 +246,7 @@ async function eliminarMatricula(id, usuarioModificador) {
 module.exports = {
   insertarMatricula,
   obtenerMatriculas,
+  obtenerTodasLasMatriculasAuditoria,
   obtenerTodasLasMatriculas,
   actualizarMatricula,
   eliminarMatricula

@@ -109,7 +109,17 @@ async function obtenerTodasLasAsistencias() {
     throw err;
   }
 }
-
+// Obtener todas las asistencias de auditoria
+async function obtenerTodasLasAsistenciasAuditoria() {
+  const sql = "SELECT * FROM tb_audit_asistencia";
+  try {
+    const result = await pool.query(sql);
+    return result.rows;
+  } catch (err) {
+    console.error("❌ Error al obtener todas las asistencias de auditoria:", err);
+    throw err;
+  }
+}
 // Actualizar asistencia
 async function actualizarAsistencia(id, datos, usuarioModificador) {
   const { alumno, fecha, dia, asistio, estado } = datos;
@@ -207,5 +217,6 @@ module.exports = {
   obtenerAsistencias,
   obtenerTodasLasAsistencias,
   actualizarAsistencia,
+  obtenerTodasLasAsistenciasAuditoria,
   eliminarAsistencia
 };
