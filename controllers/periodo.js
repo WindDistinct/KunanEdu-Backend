@@ -25,6 +25,14 @@ const listarTodo = async (_req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const listarAuditoria = async (_req, res) => {
+  try {
+    const grados = await periodoService.obtenerTodosLosPeriodosAuditoria();
+    res.json(grados);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 const actualizar = async (req, res) => {
   try {
     const cambios = await periodoService.actualizarPeriodo(req.params.id, req.body,req.user);
@@ -49,5 +57,6 @@ module.exports = {
   insertar,
   listado,
   actualizar, 
+  listarAuditoria,
   eliminar,listarTodo
 };

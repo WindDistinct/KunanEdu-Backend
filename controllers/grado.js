@@ -25,6 +25,14 @@ const listarTodo = async (_req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const listarAuditoria = async (_req, res) => {
+  try {
+    const grados = await gradoService.obtenerTodosLosGradosAuditoria();
+    res.json(grados);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 const actualizar = async (req, res) => {
   try {
     const cambios = await gradoService.actualizarGrado(req.params.id, req.body,req.user);
@@ -48,6 +56,7 @@ const eliminar = async (req, res) => {
 module.exports = {
   crear,
   listar,
+  listarAuditoria,
   actualizar,
   listarTodo,
   eliminar

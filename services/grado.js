@@ -104,7 +104,17 @@ async function obtenerTodosLosGrados() {
     throw err;
   }
 }
-
+// Obtener todos los grados de auditoria
+async function obtenerTodosLosGradosAuditoria() {
+  const sql = "SELECT * FROM tb_audit_grado";
+  try {
+    const result = await pool.query(sql);
+    return result.rows;
+  } catch (err) {
+    console.error("❌ Error al obtener todos los grados de auditoria:", err);
+    throw err;
+  }
+}
 // Actualizar grado
 async function actualizarGrado(id, datos, usuarioModificador) {
   const { nivel, anio, cupos_totales, cupos_disponibles, estado } = datos;
@@ -201,5 +211,6 @@ module.exports = {
   obtenerGrados,
   obtenerTodosLosGrados,
   actualizarGrado,
+  obtenerTodosLosGradosAuditoria,
   eliminarGrado
 };

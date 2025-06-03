@@ -108,7 +108,17 @@ async function obtenerTodasLasSecciones() {
     throw err;
   }
 }
-
+// Obtener todas las secciones de aduditoria
+async function obtenerTodasLasSeccionesAuditoria() {
+  const sql = "SELECT * FROM tb_audit_seccion";
+  try {
+    const result = await pool.query(sql);
+    return result.rows;
+  } catch (err) {
+    console.error("❌ Error al obtener todas las secciones:", err);
+    throw err;
+  }
+}
 // Actualizar sección
 async function actualizarSeccion(id, datos, usuarioModificador) {
   const { aula, grado, nombre, periodo, estado } = datos;
@@ -205,5 +215,6 @@ module.exports = {
   obtenerSecciones,
   obtenerTodasLasSecciones,
   actualizarSeccion,
-  eliminarSeccion
+  eliminarSeccion,
+  obtenerTodasLasSeccionesAuditoria
 };

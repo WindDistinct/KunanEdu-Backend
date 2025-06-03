@@ -25,7 +25,14 @@ const listarTodo = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
+const listarAuditoria = async (req, res) => {
+  try {
+    const seccion = await seccionService.obtenerTodasLasSeccionesAuditoria();
+    res.json(seccion);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 const actualizar = async (req, res) => {
   try {
     const cambios = await seccionService.actualizarSeccion(req.params.id, req.body,req.user);
@@ -51,5 +58,6 @@ module.exports = {
   listar,
   actualizar,
   eliminar,
-  listarTodo
+  listarTodo,
+  listarAuditoria
 };

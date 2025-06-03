@@ -41,7 +41,7 @@ async function registrarAuditoriaPeriodo({
 
 // Insertar periodo
 async function insertarPeriodo(datos, usuarioModificador) {
-  const { anio, descripcion } = datos;
+  const { anio, descripcion,progreso } = datos;
 
   const sqlInsert = `
     INSERT INTO tb_periodo_escolar (anio, descripcion, progreso, estado)
@@ -89,6 +89,18 @@ async function obtenerPeriodos() {
 // Obtener todos los periodos
 async function obtenerTodosLosPeriodos() {
   const sql = "SELECT * FROM tb_periodo_escolar ORDER BY anio DESC";
+  try {
+    const result = await pool.query(sql);
+    return result.rows;
+  } catch (err) {
+    console.error("❌ Error al obtener todos los periodos:", err);
+    throw err;
+  }
+}
+
+// Obtener todos los periodos de auditoria
+async function obtenerTodosLosPeriodosAuditoria() {
+  const sql = "SELECT * FROM tb_audit_periodo_escolar ORDER BY anio DESC";
   try {
     const result = await pool.query(sql);
     return result.rows;
@@ -191,6 +203,7 @@ async function eliminarPeriodo(id, usuarioModificador) {
 
 module.exports = {
   insertarPeriodo,
+  obtenerTodosLosPeriodosAuditoria,
   obtenerPeriodos,
   obtenerTodosLosPeriodos,
   actualizarPeriodo,
