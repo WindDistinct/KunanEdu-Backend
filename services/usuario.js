@@ -71,6 +71,17 @@ async function obtenerTodosLosUsuario() {
     throw err;
   }
 }
+// Obtener todos los usuarios de auditoria
+async function obtenerTodosLosUsuariosAudit() {
+  const sql = "SELECT * FROM tb_audit_usuario";
+  try {
+    const result = await pool.query(sql);
+    return result.rows;
+  } catch (err) {
+    console.error("❌ Error al obtener todos los usuarios de auditoria:", err);
+    throw err;
+  }
+}
 
 // Insertar usuario
 async function insertarUsuario(datos, usuarioModificador) {
@@ -246,5 +257,6 @@ module.exports = {
   actualizarUsuario,
   loginUsuario,
   obtenerPerfil,
+  obtenerTodosLosUsuariosAudit,
   eliminarUsuario
 };

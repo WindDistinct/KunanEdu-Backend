@@ -16,6 +16,14 @@ const listarTodo = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+const listarAuditoria = async (req, res) => {
+    try {
+        const usuarios = await usuarioService.obtenerTodosLosUsuariosAudit();
+        res.json(usuarios);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+};
 const perfilUsuario  = async (req, res) => {
   try {
     const id_usuario = req.user.id;  
@@ -84,5 +92,6 @@ module.exports = {
   listarTodo,
   eliminar,
   login,
-  perfilUsuario 
+  perfilUsuario ,
+  listarAuditoria
 };

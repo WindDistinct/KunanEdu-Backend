@@ -100,6 +100,18 @@ async function obtenerTodasLasAulas() {
   }
 }
 
+// Obtener todas las aulas de auditoria
+async function obtenerTodasLasAulasAudit() {
+  const sql = "SELECT * FROM tb_audit_aula";
+  try {
+    const result = await pool.query(sql);
+    return result.rows;
+  } catch (err) {
+    console.error("❌ Error al obtener todas las aulas de auditoria:", err);
+    throw err;
+  }
+}
+
 // Actualizar aula
 async function actualizarAula(id, datos, usuarioModificador) {
   const { numero_aula, aforo, ubicacion, estado } = datos;
@@ -190,6 +202,7 @@ async function eliminarAula(id, usuarioModificador) {
 module.exports = {
   insertarAula,
   obtenerAulas,
+  obtenerTodasLasAulasAudit,
   obtenerTodasLasAulas,
   actualizarAula,
   eliminarAula
