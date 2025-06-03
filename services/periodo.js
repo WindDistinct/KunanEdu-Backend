@@ -129,7 +129,7 @@ async function actualizarPeriodo(id, datos, usuarioModificador) {
     const sqlUpdate = `
       UPDATE tb_periodo_escolar
       SET anio = $1, descripcion = $2, progreso = $3, estado = $4
-      WHERE id_periodo = $4
+      WHERE id_periodo = $5
     `;
 
     await pool.query(sqlUpdate, [
