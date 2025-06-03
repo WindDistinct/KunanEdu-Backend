@@ -100,7 +100,7 @@ async function obtenerTodosLosPeriodos() {
 
 // Obtener todos los periodos de auditoria
 async function obtenerTodosLosPeriodosAuditoria() {
-  const sql = "SELECT * FROM tb_audit_periodo_escolar ORDER BY anio DESC";
+  const sql = "SELECT * FROM tb_audit_periodo_escolar";
   try {
     const result = await pool.query(sql);
     return result.rows;
