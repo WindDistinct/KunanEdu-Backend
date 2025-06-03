@@ -121,7 +121,7 @@ async function actualizarCurso(id, datos, usuarioModificador) {
 
     const sqlUpdate = `
       UPDATE tb_curso
-      SET nombre_curso = $1 docente = $2, estado = $3
+      SET nombre_curso = $1, docente = $2, estado = $3
       WHERE id_curso = $4
     `;
 
