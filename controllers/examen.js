@@ -25,6 +25,14 @@ const listarTodo = async (_req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const listarNotasAlumno = async (req, res) => {
+  try {
+    const examen = await examenService.obtenerExamenesAlumno(req.params.id);
+    res.json(examen);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 const listarAuditoria = async (_req, res) => {
   try {
     const examen = await examenService.obtenerTodosLosExamenesAuditoria();
@@ -58,5 +66,6 @@ module.exports = {
   listado,
   listarAuditoria,
   actualizar, 
+  listarNotasAlumno,
   eliminar,listarTodo
 };

@@ -113,6 +113,32 @@ async function obtenerTodosLosExamenesAuditoria() {
     throw err;
   }
 }
+// Obtener todos los exámenes
+async function obtenerExamenesAlumno(id) {
+   const sql = `
+    SELECT 
+      a.id_alumno,
+      CONCAT(a.nombre, ' ', a.apellido_paterno, ' ', a.apellido_materno) AS nombre_alumno,
+      c.nombre_curso,
+      s.nombre AS nombre_seccion,
+      e.bimestre,
+      e.nota
+    FROM tb_examen e
+    JOIN tb_curso c ON c.id_curso = e.curso
+    JOIN tb_seccion_alumno sa ON sa.id_seccion_alumno = e.seccion
+    JOIN tb_alumno a ON a.id_alumno = sa.alumno
+    JOIN tb_seccion s ON s.id_seccion = sa.seccion
+    WHERE a.id_alumno = $1
+    ORDER BY c.nombre_curso, e.bimestre
+  `;
+   try {
+    const result = await pool.query(sql, [id]);
+    return result.rows;
+  }  catch (err) {
+    console.error("❌ Error al obtener todos los exámenes:", err);
+    throw err;
+  }
+}
 // Actualizar examen
 async function actualizarExamen(id, datos, usuarioModificador) {
   const { curso, seccion, bimestre, nota, estado } = datos;
@@ -210,5 +236,6 @@ module.exports = {
   obtenerTodosLosExamenes,
   actualizarExamen,
   eliminarExamen,
+  obtenerExamenesAlumno,
   obtenerTodosLosExamenesAuditoria
 };
