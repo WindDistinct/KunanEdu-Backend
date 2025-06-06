@@ -39,9 +39,19 @@ async function registrarAuditoriaAula({
   }
 }
 
+
 // Insertar aula
 async function insertarAula(datos, usuarioModificador) {
-  const { numero_aula, aforo, ubicacion } = datos;
+    const { numero_aula, aforo, ubicacion } = datos;
+
+  // Verificar si ya existe el número de aula
+  const sqlCheck = `SELECT 1 FROM tb_aula WHERE numero_aula = $1`;
+  const checkResult = await pool.query(sqlCheck, [numero_aula]);
+
+  if (checkResult.rowCount > 0) {
+    // Ya existe ese número de aula, lanzar error o manejarlo
+    throw new Error("El número de aula ya existe");
+  }
 
   const sqlInsert = `
     INSERT INTO tb_aula (numero_aula, aforo, ubicacion, estado)
@@ -116,7 +126,7 @@ async function obtenerTodasLasAulasAudit() {
 async function actualizarAula(id, datos, usuarioModificador) {
   const { numero_aula, aforo, ubicacion, estado } = datos;
 
-  try {
+  try { 
     const resultAnterior = await pool.query(
       "SELECT * FROM tb_aula WHERE id_aula = $1",
       [id]
@@ -124,6 +134,15 @@ async function actualizarAula(id, datos, usuarioModificador) {
 
     if (resultAnterior.rowCount === 0) {
       throw new Error("Aula no encontrada");
+    }
+ 
+    const duplicado = await pool.query(
+      "SELECT id_aula FROM tb_aula WHERE numero_aula = $1 AND id_aula <> $2",
+      [numero_aula, id]
+    );
+
+    if (duplicado.rowCount > 0) {
+      throw new Error("El número de aula ya está en uso");
     }
 
     const anterior = resultAnterior.rows[0];
