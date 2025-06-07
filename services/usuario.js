@@ -158,6 +158,12 @@ async function actualizarUsuario(id, datos, usuarioModificador) {
 
     const anterior = resultAnterior.rows[0];
 
+    let hashedPassword = anterior.password; // por defecto conservar contraseña anterior
+
+    if (password && password.trim() !== "") {
+      hashedPassword = await encrypt(password); // solo si se quiere cambiar
+    }
+
     const sqlUpdate = `
       UPDATE tb_usuario
       SET username = $1, password = $2, rol = $3, estado = $4
