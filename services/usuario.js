@@ -144,7 +144,6 @@ async function loginUsuario({ username, password }) {
 // Actualizar usuario
 async function actualizarUsuario(id, datos, usuarioModificador) {
   const { username, password, rol, estado } = datos;
-  const hashedPassword = await encrypt(password);
 
   try {
     const resultAnterior = await pool.query(
@@ -175,7 +174,7 @@ async function actualizarUsuario(id, datos, usuarioModificador) {
       hashedPassword,
       rol,
       estado,
-      id
+      id,
     ]);
 
     await registrarAuditoriaUsuario({
@@ -188,8 +187,8 @@ async function actualizarUsuario(id, datos, usuarioModificador) {
       password_nuevo: hashedPassword,
       rol_anterior: anterior.rol,
       rol_nuevo: rol,
-      operacion: 'UPDATE',
-      usuario_modificador: usuarioModificador.usuario
+      operacion: "UPDATE",
+      usuario_modificador: usuarioModificador.usuario,
     });
 
     return { mensaje: "Usuario actualizado y auditado" };
