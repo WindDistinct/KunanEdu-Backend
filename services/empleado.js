@@ -73,6 +73,8 @@ async function insertarEmpleado(datos, usuarioModificador) {
     observacion, cargo, usuario
   } = datos;
 
+  const usuarioFinal = cargo === 'tutor' ? null : usuario;
+
   const sqlInsert = `
     INSERT INTO tb_empleado (
       nombre_emp, ape_pat_emp, ape_mat_emp,
@@ -89,7 +91,7 @@ async function insertarEmpleado(datos, usuarioModificador) {
     const result = await pool.query(sqlInsert, [
       nombre_emp, ape_pat_emp, ape_mat_emp,
       fec_nac, especialidad, dni, telefono,
-      observacion, cargo, usuario
+      observacion, cargo, usuarioFinal
     ]);
     const id_emp = result.rows[0].id_emp;
 
@@ -114,7 +116,7 @@ async function insertarEmpleado(datos, usuarioModificador) {
       cargo_anterior: null,
       cargo_nuevo: cargo,
       usuario_anterior: null,
-      usuario_nuevo: usuario,
+      usuario_nuevo: usuarioFinal,
       estado_anterior: null,
       estado_nuevo: true,
       operacion: 'INSERT',
