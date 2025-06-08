@@ -46,6 +46,11 @@ async function registrarAuditoriaGrado({
 async function insertarGrado(datos, usuarioModificador) {
   const { nivel, anio, cupos_totales, cupos_disponibles } = datos;
 
+  const sqlVerificar = `
+    SELECT id_grado FROM tb_grado
+    WHERE nivel = $1 AND anio = $2
+  `;
+
   const sqlInsert = `
     INSERT INTO tb_grado (nivel, anio, cupos_totales, cupos_disponibles, estado)
     VALUES ($1, $2, $3, $4, true)
@@ -53,11 +58,19 @@ async function insertarGrado(datos, usuarioModificador) {
   `;
 
   try {
+    // Verificar existencia previa
+    const existe = await pool.query(sqlVerificar, [nivel, anio]);
+    if (existe.rows.length > 0) {
+      throw new Error(`Ya existe un grado con nivel "${nivel}" y año "${anio}".`);
+    }
+
+    // Insertar grado
     const result = await pool.query(sqlInsert, [
-      nivel, anio, cupos_totales, cupos_disponibles
+      nivel, anio, cupos_totales, cupos_disponibles,
     ]);
     const id_grado = result.rows[0].id_grado;
 
+    // Registrar auditoría
     await registrarAuditoriaGrado({
       id_grado,
       nivel_anterior: null,
@@ -71,7 +84,7 @@ async function insertarGrado(datos, usuarioModificador) {
       estado_anterior: null,
       estado_nuevo: true,
       operacion: 'INSERT',
-      usuario: usuarioModificador.usuario
+      usuario: usuarioModificador.usuario,
     });
 
     return { mensaje: "Grado insertado y auditado", id: id_grado };
