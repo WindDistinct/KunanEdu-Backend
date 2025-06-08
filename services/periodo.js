@@ -42,6 +42,13 @@ async function registrarAuditoriaPeriodo({
 // Insertar periodo
 async function insertarPeriodo(datos, usuarioModificador) {
   const { anio, descripcion,progreso } = datos;
+ 
+  const sqlCheck = `SELECT 1 FROM tb_periodo_escolar WHERE anio = $1`;
+  const checkResult = await pool.query(sqlCheck, [anio]);
+
+  if (checkResult.rowCount > 0) { 
+    throw new Error("El periodo escolar ya existe");
+  }
 
   const sqlInsert = `
     INSERT INTO tb_periodo_escolar (anio, descripcion, progreso, estado)
