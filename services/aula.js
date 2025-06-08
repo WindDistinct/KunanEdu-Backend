@@ -9,7 +9,7 @@ async function registrarAuditoriaAula({
   estado_anterior, estado_nuevo,
   operacion, usuario
 }) {
-  const fecha = new Date().toISOString().split('T')[0]; // yyyy-mm-dd
+ const fecha = new Date(); 
 
   const sqlAudit = `
     INSERT INTO tb_audit_aula (
