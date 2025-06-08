@@ -158,7 +158,7 @@ async function obtenerTodosLosProfesores() {
   id_emp,
   nombre_emp || ' ' || ape_pat_emp || ' ' || ape_mat_emp AS nombre_completo
   FROM tb_empleado
-  WHERE cargo = 'docente' AND estado = true`;
+  WHERE cargo IN ('docente', 'tutor') AND estado = true`;
   try {
     const result = await pool.query(sql);
     return result.rows;
