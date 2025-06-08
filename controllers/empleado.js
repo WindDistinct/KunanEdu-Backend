@@ -16,6 +16,14 @@ const listarTodo = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const listarDocente = async (req, res) => {
+  try {
+    const empleados = await empleadoService.obtenerTodosLosProfesores();
+    res.json(empleados);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 const listarAuditoria = async (req, res) => {
   try {
     const empleados = await empleadoService.obtenerTodosLosEmpleadosAuditoria();
@@ -61,5 +69,6 @@ module.exports = {
   registrar,
   actualizar,
   listarAuditoria,
-  eliminar
+  eliminar,
+  listarDocente
 };
