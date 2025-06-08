@@ -73,7 +73,7 @@ async function insertarEmpleado(datos, usuarioModificador) {
     observacion, cargo, usuario
   } = datos;
 
-  const usuarioFinal = cargo === 'tutor' ? null : usuario;
+  const usuarioFinal = (cargo === 'tutor' || cargo === 'limpieza') ? null : usuario;
 
   const sqlInsert = `
     INSERT INTO tb_empleado (
@@ -129,7 +129,6 @@ async function insertarEmpleado(datos, usuarioModificador) {
     throw err;
   }
 }
-
 // Obtener empleados activos
 async function obtenerEmpleados() {
   const sql = "SELECT * FROM tb_empleado WHERE estado = true";
@@ -184,8 +183,7 @@ async function actualizarEmpleado(id, datos, usuarioModificador) {
 
     const anterior = resultAnterior.rows[0];
 
-    // Si el nuevo cargo es "tutor", eliminamos la relación con el usuario
-    if (cargo === "tutor") {
+    if (cargo === "tutor" || cargo === "limpieza") {
       usuario = null;
     }
 
@@ -237,7 +235,6 @@ async function actualizarEmpleado(id, datos, usuarioModificador) {
     throw err;
   }
 }
-
 // Eliminar empleado (borrado lógico)
 async function eliminarEmpleado(id, usuarioModificador) {
   try {
