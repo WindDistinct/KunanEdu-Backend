@@ -166,7 +166,7 @@ async function obtenerTodosLosEmpleadosAuditoria() {
 }
 // Actualizar empleado
 async function actualizarEmpleado(id, datos, usuarioModificador) {
-  const {
+  let {
     nombre_emp, ape_pat_emp, ape_mat_emp,
     fec_nac, especialidad, dni, telefono,
     observacion, cargo, usuario, estado
@@ -183,6 +183,11 @@ async function actualizarEmpleado(id, datos, usuarioModificador) {
     }
 
     const anterior = resultAnterior.rows[0];
+
+    // Si el nuevo cargo es "tutor", eliminamos la relación con el usuario
+    if (cargo === "tutor") {
+      usuario = null;
+    }
 
     const sqlUpdate = `
       UPDATE tb_empleado
