@@ -58,19 +58,17 @@ async function insertarGrado(datos, usuarioModificador) {
   `;
 
   try {
-    // Verificar existencia previa
+    
     const existe = await pool.query(sqlVerificar, [nivel, anio]);
     if (existe.rows.length > 0) {
       throw new Error(`Ya existe un grado con nivel "${nivel}" y año "${anio}".`);
     }
-
-    // Insertar grado
+ 
     const result = await pool.query(sqlInsert, [
       nivel, anio, cupos_totales, cupos_disponibles,
     ]);
     const id_grado = result.rows[0].id_grado;
-
-    // Registrar auditoría
+ 
     await registrarAuditoriaGrado({
       id_grado,
       nivel_anterior: null,
@@ -132,7 +130,7 @@ async function obtenerTodosLosGradosAuditoria() {
 async function actualizarGrado(id, datos, usuarioModificador) {
   const { nivel, anio, cupos_totales, cupos_disponibles, estado } = datos;
 
-  try {
+  try { 
     const resultAnterior = await pool.query(
       "SELECT * FROM tb_grado WHERE id_grado = $1",
       [id]
@@ -143,7 +141,17 @@ async function actualizarGrado(id, datos, usuarioModificador) {
     }
 
     const anterior = resultAnterior.rows[0];
+ 
+    const existeDuplicado = await pool.query(
+      `SELECT id_grado FROM tb_grado
+       WHERE nivel = $1 AND anio = $2 AND id_grado <> $3`,
+      [nivel, anio, id]
+    );
 
+    if (existeDuplicado.rowCount > 0) {
+      throw new Error(`Ya existe otro grado con nivel "${nivel}" y año "${anio}".`);
+    }
+ 
     const sqlUpdate = `
       UPDATE tb_grado
       SET nivel = $1, anio = $2, cupos_totales = $3, cupos_disponibles = $4, estado = $5
@@ -153,7 +161,7 @@ async function actualizarGrado(id, datos, usuarioModificador) {
     await pool.query(sqlUpdate, [
       nivel, anio, cupos_totales, cupos_disponibles, estado, id
     ]);
-
+ 
     await registrarAuditoriaGrado({
       id_grado: id,
       nivel_anterior: anterior.nivel,
