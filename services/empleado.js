@@ -16,7 +16,7 @@ async function registrarAuditoriaEmpleado({
   estado_anterior, estado_nuevo,
   operacion, usuario
 }) {
-  const fecha = new Date().toISOString().split('T')[0];
+  const fecha = new Date(); 
 
   const sqlAudit = `
     INSERT INTO tb_audit_empleado (
