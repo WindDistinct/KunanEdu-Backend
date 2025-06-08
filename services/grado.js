@@ -94,7 +94,17 @@ async function insertarGrado(datos, usuarioModificador) {
 
 // Obtener grados activos
 async function obtenerGrados() {
-  const sql = "SELECT * FROM tb_grado WHERE estado = true";
+  const sql = `
+      SELECT * FROM tb_grado where estado=true
+      ORDER BY 
+        CASE nivel
+          WHEN 'inicial' THEN 1
+          WHEN 'primaria' THEN 2
+          WHEN 'secundaria' THEN 3
+          ELSE 4
+        END,
+        anio;
+    `;
   try {
     const result = await pool.query(sql);
     return result.rows;
@@ -106,7 +116,17 @@ async function obtenerGrados() {
 
 // Obtener todos los grados
 async function obtenerTodosLosGrados() {
-  const sql = "SELECT * FROM tb_grado";
+  const sql = `
+      SELECT * FROM tb_grado
+      ORDER BY 
+        CASE nivel
+          WHEN 'inicial' THEN 1
+          WHEN 'primaria' THEN 2
+          WHEN 'secundaria' THEN 3
+          ELSE 4
+        END,
+        anio;
+    `;
   try {
     const result = await pool.query(sql);
     return result.rows;
