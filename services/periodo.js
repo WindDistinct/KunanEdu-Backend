@@ -131,6 +131,15 @@ async function actualizarPeriodo(id, datos, usuarioModificador) {
       throw new Error("Periodo no encontrado");
     }
 
+    const duplicado = await pool.query(
+      "SELECT id_periodo FROM tb_periodo_escolar WHERE anio = $1 AND id_periodo <> $2",
+      [anio, id]
+    );
+
+    if (duplicado.rowCount > 0) {
+      throw new Error("El anio de periodo escolar ya está en uso");
+    }
+
     const anterior = resultAnterior.rows[0];
 
     const sqlUpdate = `

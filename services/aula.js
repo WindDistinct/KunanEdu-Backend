@@ -43,13 +43,11 @@ async function registrarAuditoriaAula({
 // Insertar aula
 async function insertarAula(datos, usuarioModificador) {
     const { numero_aula, aforo, ubicacion } = datos;
-
-  // Verificar si ya existe el número de aula
+ 
   const sqlCheck = `SELECT 1 FROM tb_aula WHERE numero_aula = $1`;
   const checkResult = await pool.query(sqlCheck, [numero_aula]);
 
-  if (checkResult.rowCount > 0) {
-    // Ya existe ese número de aula, lanzar error o manejarlo
+  if (checkResult.rowCount > 0) { 
     throw new Error("El número de aula ya existe");
   }
 
