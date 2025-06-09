@@ -50,7 +50,7 @@ async function insertarSeccion(datos, usuarioModificador) {
   const { aula, grado, nombre, periodo } = datos;
 
   const existeAula = await pool.query(
-  `SELECT 1 FROM tb_seccion WHERE id_aula = $1 AND id_periodo = $2`,
+  `SELECT 1 FROM tb_seccion WHERE aula = $1 AND periodo = $2`,
     [aula, periodo]
   );
 
@@ -169,7 +169,7 @@ async function actualizarSeccion(id, datos, usuarioModificador) {
   if (aula !== anterior.aula || periodo !== anterior.periodo) {
     const conflicto = await pool.query(
       `SELECT 1 FROM tb_seccion 
-      WHERE id_aula = $1 AND id_periodo = $2 AND id_seccion != $3`,
+      WHERE aula = $1 AND periodo = $2 AND id_seccion != $3`,
       [aula, periodo, id]
     );
     if (conflicto.rowCount > 0) {
