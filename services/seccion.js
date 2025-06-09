@@ -90,21 +90,22 @@ async function obtenerSecciones() {
 
    const sql = `
     SELECT 
-      s.id_seccion,
-      s.nombre,
-      s.estado,
-      s.aula AS id_aula,
-      a.numero_aula AS aula,
-      s.grado AS id_grado,
-      g.nivel || ' - ' || g.anio AS grado,
-      s.periodo AS id_periodo,
-      p.anio AS periodo
+    s.id_seccion,
+    s.nombre,
+    s.estado,
+    s.aula AS id_aula,
+    a.numero_aula AS aula,
+    s.grado AS id_grado,
+    g.nivel || ' - ' || g.anio AS grado,
+    s.periodo AS id_periodo,
+    p.anio AS periodo
     FROM tb_seccion s
     JOIN tb_aula a ON s.aula = a.id_aula
     JOIN tb_grado g ON s.grado = g.id_grado
     JOIN tb_periodo_escolar p ON s.periodo = p.id_periodo
-    ORDER BY s.id_seccion WHERE estado = true;
-  `;
+    WHERE s.estado = true
+    ORDER BY s.id_seccion;
+    `;
  
   try {
     const result = await pool.query(sql);
