@@ -49,6 +49,15 @@ async function registrarAuditoriaSeccion({
 async function insertarSeccion(datos, usuarioModificador) {
   const { aula, grado, nombre, periodo } = datos;
 
+  const existeAula = await pool.query(
+  `SELECT 1 FROM tb_seccion WHERE id_aula = $1 AND id_periodo = $2`,
+    [aula, periodo]
+  );
+
+  if (existeAula.rowCount > 0) {
+    throw new Error("El aula ya está asignada a otra sección en el mismo periodo");
+  }
+
   const sqlInsert = `
     INSERT INTO tb_seccion (
       aula, grado, nombre, periodo, estado
@@ -157,7 +166,16 @@ async function obtenerTodasLasSeccionesAuditoria() {
 // Actualizar sección
 async function actualizarSeccion(id, datos, usuarioModificador) {
   const { aula, grado, nombre, periodo, estado } = datos;
-
+  if (aula !== anterior.aula || periodo !== anterior.periodo) {
+    const conflicto = await pool.query(
+      `SELECT 1 FROM tb_seccion 
+      WHERE id_aula = $1 AND id_periodo = $2 AND id_seccion != $3`,
+      [aula, periodo, id]
+    );
+    if (conflicto.rowCount > 0) {
+      throw new Error("El aula ya está asignada a otra sección en el mismo periodo");
+    }
+  }
   try {
     const resultAnterior = await pool.query(
       "SELECT * FROM tb_seccion WHERE id_seccion = $1",
