@@ -102,7 +102,7 @@ async function obtenerSecciones() {
     FROM tb_seccion s
     JOIN tb_aula a ON s.aula = a.id_aula
     JOIN tb_grado g ON s.grado = g.id_grado
-    JOIN tb_periodo p ON s.periodo = p.id_periodo
+    JOIN tb_periodo_escolar p ON s.periodo = p.id_periodo
     ORDER BY s.id_seccion WHERE estado = true";
   `;
  
@@ -131,7 +131,7 @@ async function obtenerTodasLasSecciones() {
     FROM tb_seccion s
     JOIN tb_aula a ON s.aula = a.id_aula
     JOIN tb_grado g ON s.grado = g.id_grado
-    JOIN tb_periodo p ON s.periodo = p.id_periodo
+    JOIN tb_periodo_escolar p ON s.periodo = p.id_periodo
     ORDER BY s.id_seccion";
   `;
   try {
