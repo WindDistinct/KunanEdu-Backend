@@ -71,6 +71,10 @@ async function obtenerTodosLosCursosAuditoria() {
 async function insertarCurso(datos, usuarioModificador) {
   const { nombre_curso } = datos;
 
+  const cursoExistente = await pool.query("SELECT * FROM tb_curso WHERE nombre_curso = $1", [nombre_curso]);
+  if (cursoExistente.rowCount > 0) {
+    throw new Error("Curso ya registrado");
+  }
   const sqlInsert = `
     INSERT INTO tb_curso (nombre_curso, estado)
     VALUES ($1, true)
@@ -113,6 +117,14 @@ async function actualizarCurso(id, datos, usuarioModificador) {
     }
 
     const anterior = resultAnterior.rows[0];
+    const resultDuplicado = await pool.query(
+      "SELECT * FROM tb_curso WHERE LOWER(nombre_curso) = LOWER($1) AND id_curso <> $2",
+      [nombre_curso, id]
+    );
+
+    if (resultDuplicado.rowCount > 0) {
+      throw new Error("Ya existe un curso con ese nombre");
+    }
 
     const sqlUpdate = `
       UPDATE tb_curso
