@@ -73,7 +73,7 @@ async function insertarEmpleado(datos, usuarioModificador) {
     observacion, cargo, usuario
   } = datos;
 
-  const usuarioFinal = (cargo === 'tutor' || cargo === 'limpieza') ? null : usuario;
+  const usuarioFinal = (cargo === 'almacen' || cargo === 'limpieza') ? null : usuario;
 
   const sqlInsert = `
     INSERT INTO tb_empleado (
@@ -198,7 +198,7 @@ async function actualizarEmpleado(id, datos, usuarioModificador) {
 
     const anterior = resultAnterior.rows[0];
 
-    if (cargo === "tutor" || cargo === "limpieza") {
+    if (cargo === "almacen" || cargo === "limpieza") {
       usuario = null;
     }
 
