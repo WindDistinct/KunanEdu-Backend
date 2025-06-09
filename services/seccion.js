@@ -166,16 +166,7 @@ async function obtenerTodasLasSeccionesAuditoria() {
 // Actualizar sección
 async function actualizarSeccion(id, datos, usuarioModificador) {
   const { aula, grado, nombre, periodo, estado } = datos;
-  if (aula !== anterior.aula || periodo !== anterior.periodo) {
-    const conflicto = await pool.query(
-      `SELECT 1 FROM tb_seccion 
-      WHERE aula = $1 AND periodo = $2 AND id_seccion != $3`,
-      [aula, periodo, id]
-    );
-    if (conflicto.rowCount > 0) {
-      throw new Error("El aula ya está asignada a otra sección en el mismo periodo");
-    }
-  }
+ 
   try {
     const resultAnterior = await pool.query(
       "SELECT * FROM tb_seccion WHERE id_seccion = $1",
@@ -188,6 +179,17 @@ async function actualizarSeccion(id, datos, usuarioModificador) {
 
     const anterior = resultAnterior.rows[0];
 
+     if (aula !== anterior.aula || periodo !== anterior.periodo) {
+        const conflicto = await pool.query(
+          `SELECT 1 FROM tb_seccion 
+          WHERE aula = $1 AND periodo = $2 AND id_seccion != $3`,
+          [aula, periodo, id]
+        );
+        if (conflicto.rowCount > 0) {
+          throw new Error("El aula ya está asignada a otra sección en el mismo periodo");
+        }
+      }
+    
     const sqlUpdate = `
       UPDATE tb_seccion
       SET aula = $1, grado = $2, nombre = $3, periodo = $4, estado = $5
