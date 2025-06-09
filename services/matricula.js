@@ -3,11 +3,10 @@ const pool = require("../database/db.js");
 // Función para registrar auditoría de matrícula
 async function registrarAuditoriaMatricula({
   id_matricula,
-  periodo_anterior, periodo_nuevo,
   fecha_matricula_anterior, fecha_matricula_nuevo,
   observacion_anterior, observacion_nuevo,
   alumno_anterior, alumno_nuevo,
-  grado_anterior, grado_nuevo,
+  seccion_anterior, seccion_nuevo,
   condicion_anterior, condicion_nuevo,
   estado_anterior, estado_nuevo,
   operacion, usuario
@@ -17,28 +16,26 @@ async function registrarAuditoriaMatricula({
   const sqlAudit = `
     INSERT INTO tb_audit_matricula (
       id_matricula,
-      periodo_anterior, periodo_nuevo,
       fecha_matricula_anterior, fecha_matricula_nuevo,
       observacion_anterior, observacion_nuevo,
       alumno_anterior, alumno_nuevo,
-      grado_anterior, grado_nuevo,
+      seccion_anterior, seccion_nuevo,
       condicion_anterior, condicion_nuevo,
       estado_anterior, estado_nuevo,
       operacion, fecha_modificacion, usuario_modificador
     ) VALUES (
       $1, $2, $3, $4, $5, $6, $7,
       $8, $9, $10, $11, $12, $13,
-      $14, $15, $16, $17, $18
+      $14, $15, $16
     )
   `;
 
   const values = [
-    id_matricula,
-    periodo_anterior, periodo_nuevo,
+    id_matricula, 
     fecha_matricula_anterior, fecha_matricula_nuevo,
     observacion_anterior, observacion_nuevo,
     alumno_anterior, alumno_nuevo,
-    grado_anterior, grado_nuevo,
+    seccion_anterior, seccion_nuevo,
     condicion_anterior, condicion_nuevo,
     estado_anterior, estado_nuevo,
     operacion, fecha, usuario
@@ -56,39 +53,37 @@ async function registrarAuditoriaMatricula({
 // Insertar matrícula
 async function insertarMatricula(datos, usuarioModificador) {
   const {
-    periodo, fecha_matricula, observacion,
-    alumno, grado, condicion
+     fecha_matricula, observacion,
+    alumno, seccion, condicion
   } = datos;
 
   const sqlInsert = `
     INSERT INTO tb_matricula (
-      periodo, fecha_matricula, observacion,
-      alumno, grado, condicion, estado
+       fecha_matricula, observacion,
+      alumno, seccion, condicion, estado
     ) VALUES (
-      $1, $2, $3, $4, $5, $6, true
+      $1, $2, $3, $4, $5, true
     )
     RETURNING id_matricula
   `;
 
   try {
     const result = await pool.query(sqlInsert, [
-      periodo, fecha_matricula, observacion,
-      alumno, grado, condicion
+      fecha_matricula, observacion,
+      alumno, seccion, condicion
     ]);
     const id_matricula = result.rows[0].id_matricula;
 
     await registrarAuditoriaMatricula({
       id_matricula,
-      periodo_anterior: null,
-      periodo_nuevo: periodo,
       fecha_matricula_anterior: null,
       fecha_matricula_nuevo: fecha_matricula,
       observacion_anterior: null,
       observacion_nuevo: observacion,
       alumno_anterior: null,
       alumno_nuevo: alumno,
-      grado_anterior: null,
-      grado_nuevo: grado,
+      seccion_anterior: null,
+      seccion_nuevo: seccion,
       condicion_anterior: null,
       condicion_nuevo: condicion,
       estado_anterior: null,
@@ -142,8 +137,8 @@ async function obtenerTodasLasMatriculasAuditoria() {
 // Actualizar matrícula
 async function actualizarMatricula(id, datos, usuarioModificador) {
   const {
-    periodo, fecha_matricula, observacion,
-    alumno, grado, condicion, estado
+     fecha_matricula, observacion,
+    alumno, seccion, condicion, estado
   } = datos;
 
   try {
@@ -160,28 +155,26 @@ async function actualizarMatricula(id, datos, usuarioModificador) {
 
     const sqlUpdate = `
       UPDATE tb_matricula
-      SET periodo = $1, fecha_matricula = $2, observacion = $3,
-          alumno = $4, grado = $5, condicion = $6, estado = $7
-      WHERE id_matricula = $8
+      SET fecha_matricula = $1, observacion = $2,
+          alumno = $3, seccion = $4, condicion = $5, estado = $6
+      WHERE id_matricula = $7
     `;
 
     await pool.query(sqlUpdate, [
-      periodo, fecha_matricula, observacion,
-      alumno, grado, condicion, estado, id
+       fecha_matricula, observacion,
+      alumno, seccion, condicion, estado, id
     ]);
 
     await registrarAuditoriaMatricula({
-      id_matricula: id,
-      periodo_anterior: anterior.periodo,
-      periodo_nuevo: periodo,
+      id_matricula: id, 
       fecha_matricula_anterior: anterior.fecha_matricula,
       fecha_matricula_nuevo: fecha_matricula,
       observacion_anterior: anterior.observacion,
       observacion_nuevo: observacion,
       alumno_anterior: anterior.alumno,
       alumno_nuevo: alumno,
-      grado_anterior: anterior.grado,
-      grado_nuevo: grado,
+      seccion_anterior: anterior.seccion,
+      seccion_nuevo: seccion,
       condicion_anterior: anterior.condicion,
       condicion_nuevo: condicion,
       estado_anterior: anterior.estado,
@@ -217,17 +210,15 @@ async function eliminarMatricula(id, usuarioModificador) {
     );
 
     await registrarAuditoriaMatricula({
-      id_matricula: id,
-      periodo_anterior: anterior.periodo,
-      periodo_nuevo: anterior.periodo,
+      id_matricula: id, 
       fecha_matricula_anterior: anterior.fecha_matricula,
       fecha_matricula_nuevo: anterior.fecha_matricula,
       observacion_anterior: anterior.observacion,
       observacion_nuevo: anterior.observacion,
       alumno_anterior: anterior.alumno,
       alumno_nuevo: anterior.alumno,
-      grado_anterior: anterior.grado,
-      grado_nuevo: anterior.grado,
+      seccion_anterior: anterior.seccion,
+      seccion_nuevo: anterior.seccion,
       condicion_anterior: anterior.condicion,
       condicion_nuevo: anterior.condicion,
       estado_anterior: anterior.estado,
