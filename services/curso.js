@@ -14,7 +14,7 @@ async function registrarAuditoriaCurso({
       id_curso, nombre_curso_anterior, nombre_curso_nuevo, 
       estado_anterior, estado_nuevo,
       operacion, fecha_modificacion, usuario_modificador
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
   `;
 
   const values = [
