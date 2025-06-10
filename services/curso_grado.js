@@ -83,13 +83,15 @@ async function insertarCursoGrado(datos, usuarioModificador) {
 async function obtenerCursoGrado() { 
      const sql = `
       SELECT 
-      cg.id_curso_grado,
+      cg.id_curso_grado, 
+      cg.curso AS id_curso,
+      cg.grado AS id_grado,
+      cg.estado, 
       c.nombre_curso AS curso,
-      g.anio || ' - ' || g.nivel AS grado,
-      cg.estado
+      g.nivel || ' - ' || g.anio AS grado 
     FROM tb_curso_grado cg
-    INNER JOIN tb_curso c ON cg.curso = c.id_curso
-    INNER JOIN tb_grado g ON cg.grado = g.id_grado
+    JOIN tb_curso c ON cg.curso = c.id_curso
+    JOIN tb_grado g ON cg.grado = g.id_grado
     WHERE cg.estado = true
       `;
 
@@ -105,14 +107,16 @@ async function obtenerCursoGrado() {
 // Obtener todas las aulas
 async function obtenerTodasLasCursoGrado() {
     const sql = `
-      SELECT 
-      cg.id_curso_grado,
+     SELECT 
+      cg.id_curso_grado, 
+      cg.curso AS id_curso,
+      cg.grado AS id_grado,
+      cg.estado, 
       c.nombre_curso AS curso,
-      g.anio || ' - ' || g.nivel AS grado,
-      cg.estado
+      g.nivel || ' - ' || g.anio AS grado 
     FROM tb_curso_grado cg
-    INNER JOIN tb_curso c ON cg.curso = c.id_curso
-    INNER JOIN tb_grado g ON cg.grado = g.id_grado
+    JOIN tb_curso c ON cg.curso = c.id_curso
+    JOIN tb_grado g ON cg.grado = g.id_grado
       `;
 
   try {
