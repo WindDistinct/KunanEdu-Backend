@@ -105,7 +105,20 @@ async function obtenerTodosLosPeriodos() {
   }
 }
 async function obtenerSeccionesPorPeriodo(id) {
-  const sql = "SELECT * FROM tb_seccion where periodo = $1 ";
+
+     const sql = `
+    select s.nombre, 
+    s.grado AS id_grado,
+    s.aula AS id_aula,
+    a.numero_aula AS aula,
+    g.nivel || ' - ' || g.anio AS grado
+    FROM tb_seccion S
+    JOIN tb_aula a ON s.aula = a.id_aula
+    JOIN tb_grado g ON s.grado = g.id_grado
+    WHERE s.periodo = $1 
+    `;
+ 
+ 
   try {
 
     const result =  await pool.query(sql, [
