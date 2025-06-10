@@ -20,6 +20,7 @@ const seccionRouter = require("./routes/seccion");
 const seccion_alumnoRouter = require("./routes/seccion_alumno");
 const asistenciaRouter = require("./routes/asistencia");
 const horarioRouter = require("./routes/horario");
+const curso_gradoRouter = require("./routes/curso_grado");
 
 // Middleware
 app.use(cors());
@@ -40,6 +41,8 @@ app.use("/api/seccion", seccionRouter);
 app.use("/api/seccion_alumno", seccion_alumnoRouter);
 app.use("/api/asistencia", asistenciaRouter);
 app.use("/api/horario", horarioRouter);
+app.use("/api/curso_grado", curso_gradoRouter);
+
 
 // Ping periódico cada 10 minutos a tu propia URL de Render
 cron.schedule("*/10 * * * *", async () => {
