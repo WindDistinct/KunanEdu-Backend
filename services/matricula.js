@@ -106,6 +106,7 @@ async function obtenerMatriculas() {
       cg.id_matricula, 
       cg.alumno AS id_alumno,
       cg.seccion AS id_seccion,
+       cg.condicion,
       cg.estado, 
       c.nombre || ' - ' || c.apellido_paterno || '  ' || c.apellido_materno  AS alumno,
       g.nombre || ' - ' || g.grado AS seccion 
@@ -130,6 +131,7 @@ async function obtenerTodasLasMatriculas() {
       cg.id_matricula, 
       cg.alumno AS id_alumno,
       cg.seccion AS id_seccion,
+       cg.condicion,
       cg.estado, 
       c.nombre || ' - ' || c.apellido_paterno || '  ' || c.apellido_materno  AS alumno,
       g.nombre || ' - ' || g.grado AS seccion 
