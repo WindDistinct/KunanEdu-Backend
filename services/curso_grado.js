@@ -128,7 +128,15 @@ async function actualizarCursoGrado(id, datos, usuarioModificador) {
     }
 
     const anterior = resultAnterior.rows[0];
+    const resultDuplicado = await pool.query(
+        `SELECT 1 FROM tb_curso_grado 
+        WHERE curso = $1 AND grado = $2 AND estado = true AND id_curso_grado <> $3`,
+        [curso, grado, id]
+      );
 
+      if (resultDuplicado.rowCount > 0) {
+        throw new Error("Ya existe una relación activa entre este curso y grado");
+      }
     await pool.query(
       `UPDATE tb_curso_grado
        SET curso = $1, grado = $2, estado = $3
