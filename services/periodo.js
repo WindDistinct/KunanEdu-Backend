@@ -108,6 +108,7 @@ async function obtenerSeccionesPorPeriodo(id) {
 
      const sql = `
     select s.nombre, 
+    s.id_seccion,
     s.grado AS id_grado,
     s.aula AS id_aula,
     a.numero_aula AS aula,
