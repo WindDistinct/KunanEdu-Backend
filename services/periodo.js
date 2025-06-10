@@ -104,7 +104,20 @@ async function obtenerTodosLosPeriodos() {
     throw err;
   }
 }
+async function obtenerSeccionesPorPeriodo(id) {
+  const sql = "SELECT * FROM tb_seccion where periodo = $1 ";
+  try {
 
+    const result =  await pool.query(sql, [
+      id
+    ]);
+ 
+    return result.rows;
+  } catch (err) {
+    console.error("❌ Error al obtener todos las secciones por un periodo:", err);
+    throw err;
+  }
+}
 // Obtener todos los periodos de auditoria
 async function obtenerTodosLosPeriodosAuditoria() {
   const sql = "SELECT * FROM tb_audit_periodo_escolar";
@@ -222,6 +235,7 @@ module.exports = {
   obtenerTodosLosPeriodosAuditoria,
   obtenerPeriodos,
   obtenerTodosLosPeriodos,
+  obtenerSeccionesPorPeriodo,
   actualizarPeriodo,
   eliminarPeriodo
 };
