@@ -56,17 +56,29 @@ async function insertarMatricula(datos, usuarioModificador) {
     alumno, seccion, condicion
   } = datos;
 
-  const sqlInsert = `
-    INSERT INTO tb_matricula (
-       fecha_matricula, observacion,
-      alumno, seccion, condicion, estado
-    ) VALUES (
-      $1, $2, $3, $4, $5, true
-    )
-    RETURNING id_matricula
-  `;
+
 
   try {
+
+    const existe = await pool.query(
+      `SELECT 1 FROM tb_matricula WHERE alumno = $1 AND seccion = $2`,
+      [alumno, seccion]
+    );
+
+    if (existe.rowCount > 0) {
+      throw new Error("El alumno ya está matriculado en esta sección");
+    }
+
+      const sqlInsert = `
+        INSERT INTO tb_matricula (
+          fecha_matricula, observacion,
+          alumno, seccion, condicion, estado
+        ) VALUES (
+          $1, $2, $3, $4, $5, true
+        )
+        RETURNING id_matricula
+      `;
+
     const result = await pool.query(sqlInsert, [
       new Date(), observacion,
       alumno, seccion, condicion
@@ -181,6 +193,14 @@ async function actualizarMatricula(id, datos, usuarioModificador) {
     }
 
     const anterior = resultAnterior.rows[0];
+    const existe = await pool.query(
+        `SELECT 1 FROM tb_matricula WHERE alumno = $1 AND seccion = $2 AND id_matricula <> $3`,
+        [alumno, seccion, id]
+      );
+
+      if (existe.rowCount > 0) {
+        throw new Error("Ya existe una matrícula para este alumno en esta sección");
+}
 
     const sqlUpdate = `
       UPDATE tb_matricula
