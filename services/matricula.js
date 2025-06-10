@@ -106,14 +106,17 @@ async function obtenerMatriculas() {
       cg.id_matricula, 
       cg.alumno AS id_alumno,
       cg.seccion AS id_seccion,
-       cg.condicion,
-      cg.estado, 
-      c.nombre || ' - ' || c.apellido_paterno || '  ' || c.apellido_materno  AS alumno,
-      g.nombre || ' - ' || g.grado AS seccion 
-    FROM tb_matricula cg
-    JOIN tb_alumno c ON cg.alumno = c.id_alumno
-    JOIN tb_seccion g ON cg.seccion = g.id_seccion
-    WHERE cg.estado = true
+      cg.condicion,
+      cg.observacion,
+        cg.estado, 
+        c.nombre || ' - ' || c.apellido_paterno || '  ' || c.apellido_materno  AS alumno,
+        g.nombre || ' - ' || d.anio || ' ' ||  d.nivel  || ' - ' || p.descripcion|| ' ' || p.anio AS seccion 
+      FROM tb_matricula cg
+      JOIN tb_alumno c ON cg.alumno = c.id_alumno
+      JOIN tb_seccion g ON cg.seccion = g.id_seccion
+    JOIN tb_grado d ON g.grado = d.id_grado
+    JOIN tb_periodo_escolar p ON g.periodo = p.id_periodo
+    WHERE cg.estado = true 
       `;
   try {
     const result = await pool.query(sql);
@@ -131,13 +134,16 @@ async function obtenerTodasLasMatriculas() {
       cg.id_matricula, 
       cg.alumno AS id_alumno,
       cg.seccion AS id_seccion,
-       cg.condicion,
-      cg.estado, 
-      c.nombre || ' - ' || c.apellido_paterno || '  ' || c.apellido_materno  AS alumno,
-      g.nombre || ' - ' || g.grado AS seccion 
-    FROM tb_matricula cg
-    JOIN tb_alumno c ON cg.alumno = c.id_alumno
-    JOIN tb_seccion g ON cg.seccion = g.id_seccion 
+      cg.condicion,
+      cg.observacion,
+        cg.estado, 
+        c.nombre || ' - ' || c.apellido_paterno || '  ' || c.apellido_materno  AS alumno,
+        g.nombre || ' - ' || d.anio || ' ' ||  d.nivel  || ' - ' || p.descripcion|| ' ' || p.anio AS seccion 
+      FROM tb_matricula cg
+      JOIN tb_alumno c ON cg.alumno = c.id_alumno
+      JOIN tb_seccion g ON cg.seccion = g.id_seccion
+    JOIN tb_grado d ON g.grado = d.id_grado
+    JOIN tb_periodo_escolar p ON g.periodo = p.id_periodo  
       `;
   try {
     const result = await pool.query(sql);
