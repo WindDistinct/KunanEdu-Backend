@@ -101,6 +101,7 @@ async function obtenerMatriculas() {
    const sql = `
       SELECT 
       cg.id_matricula, 
+      cg.fecha_matricula,
       cg.alumno AS id_alumno,
       cg.seccion AS id_seccion,
       cg.condicion,
@@ -129,7 +130,7 @@ async function obtenerTodasLasMatriculas() {
   const sql = `
       SELECT 
       cg.id_matricula, 
-      cg.alumno AS id_alumno,
+      cg.alumno AS id_alumno, cg.fecha_matricula,
       cg.seccion AS id_seccion,
       cg.condicion,
       cg.observacion,
