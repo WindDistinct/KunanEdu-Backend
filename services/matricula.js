@@ -101,7 +101,19 @@ async function insertarMatricula(datos, usuarioModificador) {
 
 // Obtener matrículas activas
 async function obtenerMatriculas() {
-  const sql = "SELECT * FROM tb_matricula WHERE estado = true";
+   const sql = `
+      SELECT 
+      cg.id_matricula, 
+      cg.alumno AS id_alumno,
+      cg.seccion AS id_seccion,
+      cg.estado, 
+      c.nombre || ' - ' || c.apellido_paterno || '  ' || c.apellido_materno  AS alumno,
+      g.nombre || ' - ' || g.grado AS seccion 
+    FROM tb_matricula cg
+    JOIN tb_alumno c ON cg.alumno = c.id_alumno
+    JOIN tb_seccion g ON cg.seccion = g.id_seccion
+    WHERE cg.estado = true
+      `;
   try {
     const result = await pool.query(sql);
     return result.rows;
@@ -113,7 +125,18 @@ async function obtenerMatriculas() {
 
 // Obtener todas las matrículas
 async function obtenerTodasLasMatriculas() {
-  const sql = "SELECT * FROM tb_matricula";
+  const sql = `
+      SELECT 
+      cg.id_matricula, 
+      cg.alumno AS id_alumno,
+      cg.seccion AS id_seccion,
+      cg.estado, 
+      c.nombre || ' - ' || c.apellido_paterno || '  ' || c.apellido_materno  AS alumno,
+      g.nombre || ' - ' || g.grado AS seccion 
+    FROM tb_matricula cg
+    JOIN tb_alumno c ON cg.alumno = c.id_alumno
+    JOIN tb_seccion g ON cg.seccion = g.id_seccion 
+      `;
   try {
     const result = await pool.query(sql);
     return result.rows;
