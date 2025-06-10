@@ -190,7 +190,7 @@ async function actualizarMatricula(id, datos, usuarioModificador) {
     `;
 
     await pool.query(sqlUpdate, [
-       fecha_matricula, observacion,
+      observacion,
       alumno, seccion, condicion, estado, id
     ]);
 
