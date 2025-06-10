@@ -80,8 +80,19 @@ async function insertarCursoGrado(datos, usuarioModificador) {
 }
 
 // Obtener aulas activas
-async function obtenerCursoGrado() {
-  const sql = "SELECT * FROM tb_curso_grado WHERE estado = true";
+async function obtenerCursoGrado() { 
+     const sql = `
+      SELECT 
+      cg.id_curso_grado,
+      c.nombre_curso AS curso,
+      g.anio || ' - ' || g.nivel AS grado,
+      cg.estado
+    FROM tb_curso_grado cg
+    INNER JOIN tb_curso c ON cg.curso = c.id_curso
+    INNER JOIN tb_grado g ON cg.grado = g.id_grado
+    WHERE cg.estado = true
+      `;
+
   try {
     const result = await pool.query(sql);
     return result.rows;
@@ -93,7 +104,17 @@ async function obtenerCursoGrado() {
 
 // Obtener todas las aulas
 async function obtenerTodasLasCursoGrado() {
-  const sql = "SELECT * FROM tb_curso_grado";
+    const sql = `
+      SELECT 
+      cg.id_curso_grado,
+      c.nombre_curso AS curso,
+      g.anio || ' - ' || g.nivel AS grado,
+      cg.estado
+    FROM tb_curso_grado cg
+    INNER JOIN tb_curso c ON cg.curso = c.id_curso
+    INNER JOIN tb_grado g ON cg.grado = g.id_grado
+      `;
+
   try {
     const result = await pool.query(sql);
     return result.rows;
