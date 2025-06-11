@@ -75,7 +75,40 @@ async function insertarCursoSeccion(datos, usuarioModificador) {
     throw err;
   }
 }
+async function insertarMultiplesCursoSeccion(listaDatos, usuarioModificador) {
+  const resultados = [];
 
+  for (const datos of listaDatos) {
+    const { curso, seccion, docente } = datos;
+
+    const sqlInsert = `
+      INSERT INTO tb_curso_seccion (curso, seccion, docente, estado)
+      VALUES ($1, $2, $3, true)
+      RETURNING id_curso_seccion
+    `;
+
+    const result = await pool.query(sqlInsert, [curso, seccion, docente]);
+    const id_curso_seccion = result.rows[0].id_curso_seccion;
+
+    await registrarAuditoriaCursoSeccion({
+      id_curso_seccion,
+      curso_anterior: null,
+      curso_nuevo: curso,
+      seccion_anterior: null,
+      seccion_nuevo: seccion,
+      docente_anterior: null,
+      docente_nuevo: docente,
+      estado_anterior: null,
+      estado_nuevo: true,
+      operacion: 'INSERT',
+      usuario: usuarioModificador.usuario
+    });
+
+    resultados.push({ id_curso_seccion, curso, seccion, docente });
+  }
+
+  return resultados;
+}
 // Obtener aulas activas
 async function obtenerCursoSeccion() { 
      const sql = `
@@ -230,6 +263,7 @@ async function eliminarCursoSeccion(id, usuarioModificador) {
 
 module.exports = {
   insertarCursoSeccion,
+  insertarMultiplesCursoSeccion,
   obtenerTodasLosCursoSeccion,
   obtenerCursoSeccion,
   obtenerTodasLosCursoSeccionAudit,

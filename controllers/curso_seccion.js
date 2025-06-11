@@ -17,6 +17,14 @@ const listar = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const crearMultiples = async (req, res) => {
+  try {
+    const resultado = await curso_seccionService.insertarMultiplesCursoSeccion(req.body, req.user);
+    res.json({ mensaje: "Curso-secciones creadas correctamente", resultado });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 const listarTodo = async (req, res) => {
   try {
     const curso_secciones = await curso_seccionService.obtenerTodasLosCursoSeccion();
@@ -60,5 +68,6 @@ module.exports = {
   actualizar,
   eliminar,
   listarTodo,
+  crearMultiples,
   listarAuditoria
 };
