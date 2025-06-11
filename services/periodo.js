@@ -116,7 +116,7 @@ async function obtenerSeccionesPorPeriodo(id) {
     FROM tb_seccion S
     JOIN tb_aula a ON s.aula = a.id_aula
     JOIN tb_grado g ON s.grado = g.id_grado
-    WHERE s.periodo = $1 
+    WHERE s.periodo = $1 AND s.estado=true
     `;
  
  
