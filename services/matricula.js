@@ -209,15 +209,37 @@ async function actualizarMatricula(id, datos, usuarioModificador) {
       throw new Error("Matrícula no encontrada");
     }
 
-    const anterior = resultAnterior.rows[0];
+    const anterior = resultAnterior.rows[0]; 
     const existe = await pool.query(
-        `SELECT 1 FROM tb_matricula WHERE alumno = $1 AND seccion = $2 AND id_matricula <> $3`,
-        [alumno, seccion, id]
-      );
+      `SELECT 1 
+       FROM tb_matricula 
+       WHERE alumno = $1 
+         AND seccion = $2 
+         AND id_matricula <> $3`,
+      [alumno, seccion, id]
+    );
 
-      if (existe.rowCount > 0) {
-        throw new Error("Ya existe una matrícula para este alumno en esta sección");
-}
+    if (existe.rowCount > 0) {
+      throw new Error("El alumno ya está matriculado en esta sección");
+    }
+ 
+    const matriculaEnMismoPeriodo = await pool.query(`
+      SELECT 1
+      FROM tb_matricula m
+      JOIN tb_seccion s1 ON m.seccion = s1.id_seccion
+      WHERE m.alumno = $1
+        AND m.estado = true
+        AND m.id_matricula <> $2
+        AND s1.periodo = (
+          SELECT periodo FROM tb_seccion s2 WHERE s2.id_seccion = $3
+        )
+        AND s1.id_seccion != $3
+    `, [alumno, id, seccion]);
+
+    if (matriculaEnMismoPeriodo.rowCount > 0) {
+      throw new Error("El alumno ya está matriculado en otra sección del mismo periodo");
+    }
+
 
     const sqlUpdate = `
       UPDATE tb_matricula
