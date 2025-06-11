@@ -81,6 +81,7 @@ async function obtenerCursoSeccion() {
      const sql = `
       SELECT 
         cg.id_curso_seccion, 
+        cg.docente,
         cg.curso AS id_curso,
         cg.seccion AS id_seccion,
         cg.estado, 
@@ -108,6 +109,7 @@ async function obtenerTodasLosCursoSeccion() {
     const sql = `
       SELECT 
         cg.id_curso_seccion, 
+         cg.docente,
         cg.curso AS id_curso,
         cg.seccion AS id_seccion,
         cg.estado, 
