@@ -79,9 +79,10 @@ async function insertarCursoSeccion(datos, usuarioModificador) {
 // Obtener aulas activas
 async function obtenerCursoSeccion() { 
      const sql = `
-      SELECT 
+     SELECT 
         cg.id_curso_seccion, 
-        cg.docente,
+        cg.docente as id_emp,
+        e.nombre_emp || ' - ' ||  e.ape_pat_emp  || ' - ' ||e.ape_mat_emp as docente,
         cg.curso AS id_curso,
         cg.seccion AS id_seccion,
         cg.estado, 
@@ -89,9 +90,10 @@ async function obtenerCursoSeccion() {
         g.nombre AS seccion ,
         p.anio as periodo
         FROM tb_curso_seccion cg
+        JOIN tb_empleado e ON cg.docente= e.id_emp
         JOIN tb_curso c ON cg.curso = c.id_curso
         JOIN tb_seccion g ON cg.seccion = g.id_seccion
-        JOIN tb_periodo_escolar p on g.periodo=p.id_periodo
+        JOIN tb_periodo_escolar p on g.periodo=p.id_periodo  
         WHERE cg.estado = true 
       `;
 
@@ -107,9 +109,10 @@ async function obtenerCursoSeccion() {
 // Obtener todas las aulas
 async function obtenerTodasLosCursoSeccion() {
     const sql = `
-      SELECT 
+     SELECT 
         cg.id_curso_seccion, 
-         cg.docente,
+        cg.docente as id_emp,
+        e.nombre_emp || ' - ' ||  e.ape_pat_emp  || ' - ' ||e.ape_mat_emp as docente,
         cg.curso AS id_curso,
         cg.seccion AS id_seccion,
         cg.estado, 
@@ -117,9 +120,10 @@ async function obtenerTodasLosCursoSeccion() {
         g.nombre AS seccion ,
         p.anio as periodo
         FROM tb_curso_seccion cg
+        JOIN tb_empleado e ON cg.docente= e.id_emp
         JOIN tb_curso c ON cg.curso = c.id_curso
         JOIN tb_seccion g ON cg.seccion = g.id_seccion
-        JOIN tb_periodo_escolar p on g.periodo=p.id_periodo 
+        JOIN tb_periodo_escolar p on g.periodo=p.id_periodo  
       `;
 
   try {
