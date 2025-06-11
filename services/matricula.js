@@ -69,6 +69,23 @@ async function insertarMatricula(datos, usuarioModificador) {
       throw new Error("El alumno ya está matriculado en esta sección");
     }
 
+    const matriculaEnMismoPeriodo = await pool.query(`
+      SELECT 1
+      FROM tb_matricula m
+      JOIN tb_seccion s1 ON m.seccion = s1.id_seccion
+      WHERE m.alumno = $1
+        AND m.estado = true
+        AND s1.periodo = (
+          SELECT periodo FROM tb_seccion s2 WHERE s2.id_seccion = $2
+        )
+        AND s1.id_seccion != $2
+    `, [alumno, seccion]);
+
+    if (matriculaEnMismoPeriodo.rowCount > 0) {
+      throw new Error("El alumno ya está matriculado en otra sección del mismo periodo");
+    }
+
+
       const sqlInsert = `
         INSERT INTO tb_matricula (
           fecha_matricula, observacion,
