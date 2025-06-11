@@ -11,7 +11,7 @@ async function registrarAuditoriaCursoSeccion({
   const fecha = new Date();
 
   const sqlAudit = `
-    INSERT INTO tb_audit_curso_grado (
+    INSERT INTO tb_audit_curso_seccion (
       id_curso_seccion, curso_anterior, curso_nuevo,
      seccion_anterior, seccion_nuevo,
       docente_anterior, docente_nuevo,
