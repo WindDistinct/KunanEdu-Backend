@@ -87,13 +87,14 @@ async function obtenerCursoSeccion() {
         cg.seccion AS id_seccion,
         cg.estado, 
         c.nombre_curso AS curso,
-        g.nombre AS seccion ,
+        g.nombre || ' - ' || m.anio || ' - ' || m.nivel || ' - ' ||p.descripcion || ' - ' ||p.anio AS seccion ,
         p.anio as periodo
-        FROM tb_curso_seccion cg
+        FROM tb_curso_seccion cg 
         JOIN tb_empleado e ON cg.docente= e.id_emp
         JOIN tb_curso c ON cg.curso = c.id_curso
         JOIN tb_seccion g ON cg.seccion = g.id_seccion
-        JOIN tb_periodo_escolar p on g.periodo=p.id_periodo  
+        JOIN tb_grado m ON g.grado=m.id_grado
+		JOIN tb_periodo_escolar p on g.periodo=p.id_periodo   
         WHERE cg.estado = true 
       `;
 
@@ -109,7 +110,7 @@ async function obtenerCursoSeccion() {
 // Obtener todas las aulas
 async function obtenerTodasLosCursoSeccion() {
     const sql = `
-     SELECT 
+      SELECT 
         cg.id_curso_seccion, 
         cg.docente as id_emp,
         e.nombre_emp || ' - ' ||  e.ape_pat_emp  || ' - ' ||e.ape_mat_emp as docente,
@@ -117,13 +118,14 @@ async function obtenerTodasLosCursoSeccion() {
         cg.seccion AS id_seccion,
         cg.estado, 
         c.nombre_curso AS curso,
-        g.nombre AS seccion ,
+        g.nombre || ' - ' || m.anio || ' - ' || m.nivel || ' - ' ||p.descripcion || ' - ' ||p.anio AS seccion ,
         p.anio as periodo
-        FROM tb_curso_seccion cg
+        FROM tb_curso_seccion cg 
         JOIN tb_empleado e ON cg.docente= e.id_emp
         JOIN tb_curso c ON cg.curso = c.id_curso
         JOIN tb_seccion g ON cg.seccion = g.id_seccion
-        JOIN tb_periodo_escolar p on g.periodo=p.id_periodo  
+        JOIN tb_grado m ON g.grado=m.id_grado
+		JOIN tb_periodo_escolar p on g.periodo=p.id_periodo   
       `;
 
   try {
