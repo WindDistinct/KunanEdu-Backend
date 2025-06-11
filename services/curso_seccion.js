@@ -167,7 +167,7 @@ async function actualizarCursoSeccion(id, datos, usuarioModificador) {
     );
 
      await registrarAuditoriaCursoSeccion({
-      id_curso_seccion,
+      id_curso_seccion:id,
       curso_anterior: null,
       curso_nuevo: curso,
       seccion_anterior: null,
@@ -176,7 +176,7 @@ async function actualizarCursoSeccion(id, datos, usuarioModificador) {
       docente_nuevo: docente,
       estado_anterior: null,
       estado_nuevo: true,
-      operacion: 'INSERT',
+      operacion: 'UPDATE',
       usuario: usuarioModificador.usuario
     });
 
