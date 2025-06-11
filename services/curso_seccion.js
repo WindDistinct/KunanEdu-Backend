@@ -109,6 +109,23 @@ async function insertarMultiplesCursoSeccion(listaDatos, usuarioModificador) {
 
   return resultados;
 }
+
+async function verificarCursosAsignados(idSeccion) {
+  try {
+    const result = await pool.query(
+      `SELECT 1 FROM tb_curso_seccion
+       WHERE seccion = $1 AND estado = true
+       LIMIT 1`,
+      [idSeccion]
+    );
+
+    return result.rowCount > 0;
+  } catch (err) {
+    console.error("❌ Error al verificar cursos asignados a la sección:", err);
+    throw err;
+  }
+}
+
 // Obtener aulas activas
 async function obtenerCursoSeccion() { 
      const sql = `
@@ -264,6 +281,7 @@ async function eliminarCursoSeccion(id, usuarioModificador) {
 module.exports = {
   insertarCursoSeccion,
   insertarMultiplesCursoSeccion,
+  verificarCursosAsignados,
   obtenerTodasLosCursoSeccion,
   obtenerCursoSeccion,
   obtenerTodasLosCursoSeccionAudit,

@@ -33,6 +33,16 @@ const listarTodo = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+const verificarCursosAsignados = async (req, res) => {
+  try { 
+    const existeAsignacion = await curso_seccionService.verificarCursosAsignados(req.params.id);
+    res.json({ asignados: existeAsignacion });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const listarAuditoria = async (req, res) => {
   try {
     const curso_secciones = await curso_seccionService.obtenerTodasLosCursoSeccionAudit();
@@ -65,6 +75,7 @@ const eliminar = async (req, res) => {
 module.exports = {
   crear,
   listar,
+  verificarCursosAsignados,
   actualizar,
   eliminar,
   listarTodo,
