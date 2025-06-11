@@ -103,7 +103,33 @@ async function obtenerCursoGrado() {
     throw err;
   }
 }
+async function obtenerCursoPorGrado(id) {
 
+     const sql = `
+      select 
+      s.grado AS id_grado,
+      s.curso AS id_curso,
+      a.nombre_curso AS curso,
+      g.nivel || ' - ' || g.anio AS grado
+      FROM tb_curso_grado S
+      JOIN tb_curso a ON s.curso = a.id_curso
+      JOIN tb_grado g ON s.grado = g.id_grado
+      WHERE a.estado =  true AND s.grado=$1  
+    `;
+ 
+ 
+  try {
+
+    const result =  await pool.query(sql, [
+      id
+    ]);
+ 
+    return result.rows;
+  } catch (err) {
+    console.error("❌ Error al obtener todos los cursos por grado:", err);
+    throw err;
+  }
+}
 // Obtener todas las aulas
 async function obtenerTodasLasCursoGrado() {
     const sql = `
@@ -228,6 +254,7 @@ async function eliminarCursoGrado(id, usuarioModificador) {
 module.exports = {
   insertarCursoGrado,
   obtenerCursoGrado,
+  obtenerCursoPorGrado,
   obtenerTodasLasCursoGradoAudit,
   obtenerTodasLasCursoGrado,
   actualizarCursoGrado,

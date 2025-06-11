@@ -25,6 +25,14 @@ const listarTodo = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const listarCursoGradoPorId = async (req, res) => {
+  try {
+    const curso_grado = await curso_gradoService.obtenerCursoPorGrado(req.params.id);
+    res.json(curso_grado);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 const listarAuditoria = async (req, res) => {
   try {
     const curso_grados = await curso_gradoService.obtenerTodasLasCursoGradoAudit();
@@ -55,6 +63,7 @@ const eliminar = async (req, res) => {
 };
 
 module.exports = {
+  listarCursoGradoPorId,
   crear,
   listar,
   actualizar,
