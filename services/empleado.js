@@ -79,10 +79,10 @@ async function insertarEmpleado(datos, usuarioModificador) {
     'SELECT id_emp FROM tb_empleado WHERE dni = $1',
     [dni]
     );
-
-    if (existeEmpleado.rows.length > 0) {
-      return { error: 'El empleado con este DNI ya está registrado' };
-    }
+  if (existeEmpleado.rowCount > 0) {
+    throw new Error("El empleado con este DNI ya está registrad");
+  }
+   
 
   const sqlInsert = `
     INSERT INTO tb_empleado (
