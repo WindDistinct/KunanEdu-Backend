@@ -75,6 +75,15 @@ async function insertarEmpleado(datos, usuarioModificador) {
 
   const usuarioFinal = (cargo === 'almacen' || cargo === 'limpieza') ? null : usuario;
 
+    const existeEmpleado = await pool.query(
+    'SELECT id_emp FROM tb_empleado WHERE dni = $1',
+    [dni]
+    );
+
+    if (existeEmpleado.rows.length > 0) {
+      return { error: 'El empleado con este DNI ya está registrado' };
+    }
+
   const sqlInsert = `
     INSERT INTO tb_empleado (
       nombre_emp, ape_pat_emp, ape_mat_emp,
