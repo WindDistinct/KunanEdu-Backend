@@ -83,7 +83,7 @@ async function insertarPeriodo(datos, usuarioModificador) {
 
 // Obtener periodos activos
 async function obtenerPeriodos() {
-  const sql = "SELECT * FROM tb_periodo_escolar WHERE estado = true ORDER BY anio DESC";
+  const sql = "SELECT * FROM tb_periodo_escolar WHERE progreso = 'En curso' ORDER BY anio DESC";
   try {
     const result = await pool.query(sql);
     return result.rows;
