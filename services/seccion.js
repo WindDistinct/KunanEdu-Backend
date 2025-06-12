@@ -182,11 +182,11 @@ async function actualizarSeccion(id, datos, usuarioModificador) {
      if (aula !== anterior.aula || periodo !== anterior.periodo) {
         const conflicto = await pool.query(
           `SELECT 1 FROM tb_seccion 
-          WHERE aula = $1 AND periodo = $2 AND id_seccion != $3`,
+          WHERE aula = $1 AND periodo = $2 AND estado=true AND id_seccion != $3`,
           [aula, periodo, id]
         );
         if (conflicto.rowCount > 0) {
-          throw new Error("El aula ya está asignada a otra sección en el mismo periodo");
+          throw new Error("El aula ya está asignada a otra sección(activa) en el mismo periodo");
         }
       }
     
