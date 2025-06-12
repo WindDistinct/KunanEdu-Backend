@@ -50,12 +50,12 @@ async function insertarSeccion(datos, usuarioModificador) {
   const { aula, grado, nombre, periodo } = datos;
 
   const existeAula = await pool.query(
-  `SELECT 1 FROM tb_seccion WHERE aula = $1 AND periodo = $2`,
+  `SELECT 1 FROM tb_seccion WHERE aula = $1 AND periodo = $2 AND estado=true`,
     [aula, periodo]
   );
 
   if (existeAula.rowCount > 0) {
-    throw new Error("El aula ya está asignada a otra sección en el mismo periodo");
+    throw new Error("El aula ya está asignada a otra sección (activa) en el mismo periodo");
   }
 
   const sqlInsert = `
