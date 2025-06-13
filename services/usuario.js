@@ -91,13 +91,24 @@ async function insertarUsuario(datos, usuarioModificador) {
   const { username, password, rol,empleado } = datos;
   const hashedPassword = await encrypt(password);
 
-  const sqlInsert = `
+  const sqlCheck = `
+    SELECT 1 FROM tb_usuario WHERE empleado = $1
+  `;
+
+ 
+  try {
+    const existe = await pool.query(sqlCheck, [empleado]);
+
+    if (existe.rowCount > 0) {
+      throw new Error("Este empleado ya tiene un usuario registrado.");
+    }
+
+    const sqlInsert = `
     INSERT INTO tb_usuario (username, estado, password, rol,empleado)
     VALUES ($1, true, $2, $3,$4)
     RETURNING id_usuario
-  `;
+    `;
 
-  try {
     const result = await pool.query(sqlInsert, [username, hashedPassword, rol,empleado]);
     const id_usuario = result.rows[0].id_usuario;
 
@@ -162,6 +173,15 @@ async function actualizarUsuario(id, datos, usuarioModificador) {
 
     const anterior = resultAnterior.rows[0];
 
+    const checkEmpleado = await pool.query(
+      "SELECT 1 FROM tb_usuario WHERE empleado = $1 AND id_usuario <> $2",
+      [empleado, id]
+    );
+
+    if (checkEmpleado.rowCount > 0) {
+      throw new Error("Este empleado ya está asignado a otro usuario.");
+    }
+    
     let hashedPassword = anterior.password; // por defecto conservar contraseña anterior
 
     if (password && password.trim() !== "") {
