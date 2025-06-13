@@ -170,6 +170,21 @@ async function obtenerTodosLosProfesores() {
     throw err;
   }
 }
+async function obtenerTodosLosEmmpleadosUsuarios() {
+  const sql = `SELECT 
+  id_emp,
+  nombre_emp || ' ' || ape_pat_emp || ' ' || ape_mat_emp AS nombre_completo,
+  especialidad
+  FROM tb_empleado
+  WHERE cargo IN ('docente', 'tutor','consultor') AND estado = true`;
+  try {
+    const result = await pool.query(sql);
+    return result.rows;
+  } catch (err) {
+    console.error("❌ Error al obtener todos los empleados:", err);
+    throw err;
+  }
+}
 // Obtener todos los empleados de auditoria
 async function obtenerTodosLosEmpleadosAuditoria() {
   const sql = "SELECT * FROM tb_audit_empleado";
@@ -306,5 +321,6 @@ module.exports = {
   obtenerTodosLosEmpleados,
   actualizarEmpleado,
   eliminarEmpleado,
-  obtenerTodosLosProfesores
+  obtenerTodosLosProfesores,
+  obtenerTodosLosEmmpleadosUsuarios
 };
