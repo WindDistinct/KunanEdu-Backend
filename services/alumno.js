@@ -120,18 +120,20 @@ async function obtenerAlumnos() {
     throw err;
   }
 }
-async function obtenerAlumnosAula(aula) {
+async function obtenerAlumnosAula(aula,cursoseccion) {
    const sql = `
-  select   m.id_matricula,l.id_alumno,l.nombre ||' '||l.apellido_paterno||' '||l.apellido_materno ||' '||m.id_matricula as nombre_completo ,a.numero_aula as numero_aula, s.nombre ||' '|| g.anio ||' '||g.nivel as seccion, p.anio as periodo from tb_matricula m
+  select d.id_curso_seccion, c.nombre_curso,s.nombre ||' '||g.anio as seccion,m.id_matricula,l.id_alumno,l.nombre ||' '||l.apellido_paterno||' '||l.apellido_materno ||' '||m.id_matricula as nombre_completo ,a.numero_aula as numero_aula, s.nombre ||' '|| g.anio ||' '||g.nivel as seccion, p.anio as periodo from tb_matricula m
    JOIN tb_seccion s ON m.seccion=s.id_seccion
+      JOIN tb_curso_seccion d ON s.id_seccion=d.seccion
+	  JOIN tb_curso c ON d.curso=c.id_curso
     JOIN tb_periodo_escolar p ON s.periodo=p.id_periodo
     JOIN tb_grado g ON s.grado=g.id_grado
     JOIN tb_aula a ON s.aula=a.id_aula
     JOIN tb_alumno l ON m.alumno=l.id_alumno
-    WHERE m.condicion='Matriculado' AND a.numero_aula=$1 AND s.estado=true 
+    WHERE m.condicion='Matriculado' AND a.numero_aula=$1 AND d.id_curso_seccion=$2 AND s.estado=true 
   `;
   try {
-    const result = await pool.query(sql, [aula]);
+    const result = await pool.query(sql, [aula,cursoseccion]);
     return result.rows;
   } catch (err) {
     console.error("❌ Error al obtener los alumnos:", err);

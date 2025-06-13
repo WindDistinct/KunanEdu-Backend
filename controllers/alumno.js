@@ -20,10 +20,10 @@ const listarAuditoria = async (req, res) => {
       }
 };
 const listarAlumnoAula = async (req, res) => {
-   const { aula } = req.params;
+   const { aula,cursoseccion } = req.params;
   
     try {
-      const estudiantes = await estudianteService.obtenerAlumnosAula(parseInt(aula));
+      const estudiantes = await estudianteService.obtenerAlumnosAula(parseInt(aula),parseInt(cursoseccion));
       res.json(estudiantes);
     } catch (error) {
       res.status(500).json({ error: error.message });

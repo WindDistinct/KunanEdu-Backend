@@ -8,7 +8,7 @@ const checkRol = require("../middleware/rol");
 router.get("/all", listado);
 router.get("/all-adm", listarTodo);
 router.get("/all-audit", listarAuditoria);
-router.get("/alumnos-aula/:aula", listarAlumnoAula);
+router.get("/alumnos-aula/:aula/:cursoseccion", listarAlumnoAula);
 router.delete("/delete/:id",checkAuth,checkRol('administrador'),eliminar)
 router.put("/update/:id",checkAuth,checkRol('administrador'),actualizar)
 router.post("/create", checkAuth,checkRol('administrador'),insertar);
