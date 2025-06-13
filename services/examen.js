@@ -3,8 +3,8 @@ const pool = require("../database/db.js");
 // Auditoría de examen
 async function registrarAuditoriaExamen({
   id_examen,
-  curso_anterior, curso_nuevo,
-  seccion_anterior, seccion_nuevo,
+  matricula_anterior, matricula_nuevo,
+  curso_seccion_anterior, curso_seccion_nuevo,
   bimestre_anterior, bimestre_nuevo,
   nota_anterior, nota_nuevo,
   estado_anterior, estado_nuevo,
@@ -14,8 +14,9 @@ async function registrarAuditoriaExamen({
 
   const sqlAudit = `
     INSERT INTO tb_audit_examen (
-      id_examen, curso_anterior, curso_nuevo,
-      seccion_anterior, seccion_nuevo,
+      id_examen, 
+      matricula_anterior, matricula_nuevo,
+     curso_seccion_anterior, curso_seccion_nuevo,
       bimestre_anterior, bimestre_nuevo,
       nota_anterior, nota_nuevo,
       estado_anterior, estado_nuevo,
@@ -25,8 +26,8 @@ async function registrarAuditoriaExamen({
 
   const values = [
     id_examen,
-    curso_anterior, curso_nuevo,
-    seccion_anterior, seccion_nuevo,
+    matricula_anterior, matricula_nuevo,
+  curso_seccion_anterior, curso_seccion_nuevo,
     bimestre_anterior, bimestre_nuevo,
     nota_anterior, nota_nuevo,
     estado_anterior, estado_nuevo,
@@ -44,24 +45,24 @@ async function registrarAuditoriaExamen({
 
 // Insertar examen
 async function insertarExamen(datos, usuarioModificador) {
-  const { curso, seccion, bimestre, nota } = datos;
+  const { matricula, cursoseccion, bimestre, nota } = datos;
 
   const sqlInsert = `
-    INSERT INTO tb_examen (curso, seccion, bimestre, nota, estado)
+    INSERT INTO tb_examen (matricula, cursoseccion, bimestre, nota, estado)
     VALUES ($1, $2, $3, $4, true)
     RETURNING id_examen
   `;
 
   try {
-    const result = await pool.query(sqlInsert, [curso, seccion, bimestre, nota]);
+    const result = await pool.query(sqlInsert, [matricula, cursoseccion, bimestre, nota]);
     const id_examen = result.rows[0].id_examen;
 
     await registrarAuditoriaExamen({
       id_examen,
-      curso_anterior: null,
-      curso_nuevo: curso,
-      seccion_anterior: null,
-      seccion_nuevo: seccion,
+      matricula_anterior: null,
+      matricula_nuevo: curso,
+      curso_seccion_anterior: null,
+      curso_seccion_nuevo: seccion,
       bimestre_anterior: null,
       bimestre_nuevo: bimestre,
       nota_anterior: null,
@@ -141,7 +142,7 @@ async function obtenerExamenesAlumno(id) {
 }
 // Actualizar examen
 async function actualizarExamen(id, datos, usuarioModificador) {
-  const { curso, seccion, bimestre, nota, estado } = datos;
+  const { matricula, cursoseccion, bimestre, nota, estado } = datos;
 
   try {
     const resultAnterior = await pool.query(
@@ -157,20 +158,20 @@ async function actualizarExamen(id, datos, usuarioModificador) {
 
     const sqlUpdate = `
       UPDATE tb_examen
-      SET curso = $1, seccion = $2, bimestre = $3, nota = $4, estado = $5
+      SET matricula = $1, cursoseccion = $2, bimestre = $3, nota = $4, estado = $5
       WHERE id_examen = $6
     `;
 
     await pool.query(sqlUpdate, [
-      curso, seccion, bimestre, nota, estado, id
+      matricula, cursoseccion, bimestre, nota, estado, id
     ]);
 
     await registrarAuditoriaExamen({
       id_examen: id,
-      curso_anterior: anterior.curso,
-      curso_nuevo: curso,
-      seccion_anterior: anterior.seccion,
-      seccion_nuevo: seccion,
+      matricula_anterior: anterior.curso,
+      matricula_nuevo: curso,
+      curso_seccion_anterior: anterior.seccion,
+      curso_seccion_nuevo: seccion,
       bimestre_anterior: anterior.bimestre,
       bimestre_nuevo: bimestre,
       nota_anterior: anterior.nota,
@@ -209,10 +210,10 @@ async function eliminarExamen(id, usuarioModificador) {
 
     await registrarAuditoriaExamen({
       id_examen: id,
-      curso_anterior: anterior.curso,
-      curso_nuevo: anterior.curso,
-      seccion_anterior: anterior.seccion,
-      seccion_nuevo: anterior.seccion,
+      matricula_anterior: anterior.curso,
+      matricula_nuevo: anterior.curso,
+      curso_seccion_anterior: anterior.seccion,
+      curso_seccion_nuevo: anterior.seccion,
       bimestre_anterior: anterior.bimestre,
       bimestre_nuevo: anterior.bimestre,
       nota_anterior: anterior.nota,
