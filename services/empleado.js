@@ -170,6 +170,37 @@ async function obtenerTodosLosProfesores() {
     throw err;
   }
 }
+async function obtenerCursosPorDocenteYPeriodo(idDocente, periodo) {
+  const sql = `
+    SELECT 
+      e.cargo,
+      e.id_emp || ' - ' || e.nombre_emp || ' ' || e.ape_pat_emp AS id_nombreEmpleado,
+      u.username,
+      s.id_curso_seccion,
+      c.id_curso,
+      c.nombre_curso,
+      a.numero_aula,
+      h.nombre AS seccion,
+      g.anio || ' ' || g.nivel AS grado,
+      h.periodo
+    FROM tb_curso_seccion s
+    JOIN tb_curso c ON s.curso = c.id_curso
+    JOIN tb_empleado e ON s.docente = e.id_emp
+    JOIN tb_seccion h ON s.seccion = h.id_seccion
+    JOIN tb_grado g ON h.grado = g.id_grado
+    JOIN tb_aula a ON h.aula = a.id_aula
+    JOIN tb_usuario u ON e.id_emp = u.empleado
+    WHERE e.id_emp = $1 AND h.periodo = $2 AND s.estado = true
+  `;
+
+  try {
+    const result = await pool.query(sql, [idDocente, periodo]);
+    return result.rows;
+  } catch (err) {
+    console.error("❌ Error al obtener cursos por docente y periodo:", err);
+    throw err;
+  }
+}
 async function obtenerTodosLosEmmpleadosUsuarios() {
   const sql = `SELECT 
   id_emp,
@@ -322,5 +353,6 @@ module.exports = {
   actualizarEmpleado,
   eliminarEmpleado,
   obtenerTodosLosProfesores,
+  obtenerCursosPorDocenteYPeriodo,
   obtenerTodosLosEmmpleadosUsuarios
 };
