@@ -122,9 +122,8 @@ async function obtenerAlumnos() {
 }
 async function obtenerAlumnosAula(aula) {
    const sql = `
-  select  d.id_curso_seccion,m.id_matricula,l.id_alumno,l.nombre ||' '||l.apellido_paterno||' '||l.apellido_materno ||' '||m.id_matricula as nombre_completo ,a.numero_aula as numero_aula, s.nombre ||' '|| g.anio ||' '||g.nivel as seccion, p.anio as periodo from tb_matricula m
+  select   m.id_matricula,l.id_alumno,l.nombre ||' '||l.apellido_paterno||' '||l.apellido_materno ||' '||m.id_matricula as nombre_completo ,a.numero_aula as numero_aula, s.nombre ||' '|| g.anio ||' '||g.nivel as seccion, p.anio as periodo from tb_matricula m
    JOIN tb_seccion s ON m.seccion=s.id_seccion
-      JOIN tb_curso_seccion d ON s.id_seccion=d.seccion
     JOIN tb_periodo_escolar p ON s.periodo=p.id_periodo
     JOIN tb_grado g ON s.grado=g.id_grado
     JOIN tb_aula a ON s.aula=a.id_aula
