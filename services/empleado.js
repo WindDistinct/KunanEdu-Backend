@@ -12,7 +12,6 @@ async function registrarAuditoriaEmpleado({
   telefono_anterior, telefono_nuevo,
   observacion_anterior, observacion_nuevo,
   cargo_anterior, cargo_nuevo,
-  usuario_anterior, usuario_nuevo,
   estado_anterior, estado_nuevo,
   operacion, usuario
 }) {
@@ -29,14 +28,13 @@ async function registrarAuditoriaEmpleado({
       telefono_anterior, telefono_nuevo,
       observacion_anterior, observacion_nuevo,
       cargo_anterior, cargo_nuevo,
-      usuario_anterior, usuario_nuevo,
       estado_anterior, estado_nuevo,
       operacion, fecha_modificacion, usuario_modificador
     ) VALUES (
       $1, $2, $3, $4, $5, $6, $7,
       $8, $9, $10, $11, $12, $13,
       $14, $15, $16, $17, $18, $19,
-      $20, $21, $22, $23, $24, $25, $26
+      $20, $21, $22, $23, $24
     )
   `;
 
@@ -51,7 +49,6 @@ async function registrarAuditoriaEmpleado({
     telefono_anterior, telefono_nuevo,
     observacion_anterior, observacion_nuevo,
     cargo_anterior, cargo_nuevo,
-    usuario_anterior, usuario_nuevo,
     estado_anterior, estado_nuevo,
     operacion, fecha, usuario
   ];
@@ -70,28 +67,26 @@ async function insertarEmpleado(datos, usuarioModificador) {
   const {
     nombre_emp, ape_pat_emp, ape_mat_emp,
     fec_nac, especialidad, dni, telefono,
-    observacion, cargo, usuario
+    observacion, cargo
   } = datos;
-
-  const usuarioFinal = (cargo === 'almacen' || cargo === 'limpieza') ? null : usuario;
 
     const existeEmpleado = await pool.query(
     'SELECT id_emp FROM tb_empleado WHERE dni = $1',
     [dni]
     );
-  if (existeEmpleado.rowCount > 0) {
-    throw new Error("El empleado con este DNI ya está registrad");
-  }
-   
+    if (existeEmpleado.rowCount > 0) {
+      throw new Error("El empleado con este DNI ya está registrad");
+    }
+    
 
   const sqlInsert = `
     INSERT INTO tb_empleado (
       nombre_emp, ape_pat_emp, ape_mat_emp,
       fec_nac, especialidad, dni, telefono,
-      observacion, cargo, usuario, estado
+      observacion, cargo, estado
     ) VALUES (
       $1, $2, $3, $4, $5, $6, $7,
-      $8, $9, $10, true
+      $8, $9, true
     )
     RETURNING id_emp
   `;
@@ -100,7 +95,7 @@ async function insertarEmpleado(datos, usuarioModificador) {
     const result = await pool.query(sqlInsert, [
       nombre_emp, ape_pat_emp, ape_mat_emp,
       fec_nac, especialidad, dni, telefono,
-      observacion, cargo, usuarioFinal
+      observacion, cargo
     ]);
     const id_emp = result.rows[0].id_emp;
 
@@ -124,8 +119,6 @@ async function insertarEmpleado(datos, usuarioModificador) {
       observacion_nuevo: observacion,
       cargo_anterior: null,
       cargo_nuevo: cargo,
-      usuario_anterior: null,
-      usuario_nuevo: usuarioFinal,
       estado_anterior: null,
       estado_nuevo: true,
       operacion: 'INSERT',
@@ -193,7 +186,7 @@ async function actualizarEmpleado(id, datos, usuarioModificador) {
   let {
     nombre_emp, ape_pat_emp, ape_mat_emp,
     fec_nac, especialidad, dni, telefono,
-    observacion, cargo, usuario, estado
+    observacion, cargo, estado
   } = datos;
 
   try {
@@ -208,22 +201,18 @@ async function actualizarEmpleado(id, datos, usuarioModificador) {
 
     const anterior = resultAnterior.rows[0];
 
-    if (cargo === "almacen" || cargo === "limpieza") {
-      usuario = null;
-    }
-
     const sqlUpdate = `
       UPDATE tb_empleado
       SET nombre_emp = $1, ape_pat_emp = $2, ape_mat_emp = $3,
           fec_nac = $4, especialidad = $5, dni = $6, telefono = $7,
-          observacion = $8, cargo = $9, usuario = $10, estado = $11
-      WHERE id_emp = $12
+          observacion = $8, cargo = $9, estado = $10
+      WHERE id_emp = $11
     `;
 
     await pool.query(sqlUpdate, [
       nombre_emp, ape_pat_emp, ape_mat_emp,
       fec_nac, especialidad, dni, telefono,
-      observacion, cargo, usuario, estado, id
+      observacion, cargo, estado, id
     ]);
 
     await registrarAuditoriaEmpleado({
@@ -246,8 +235,6 @@ async function actualizarEmpleado(id, datos, usuarioModificador) {
       observacion_nuevo: observacion,
       cargo_anterior: anterior.cargo,
       cargo_nuevo: cargo,
-      usuario_anterior: anterior.usuario,
-      usuario_nuevo: usuario,
       estado_anterior: anterior.estado,
       estado_nuevo: estado,
       operacion: 'UPDATE',
@@ -299,8 +286,6 @@ async function eliminarEmpleado(id, usuarioModificador) {
       observacion_nuevo: anterior.observacion,
       cargo_anterior: anterior.cargo,
       cargo_nuevo: anterior.cargo,
-      usuario_anterior: anterior.usuario,
-      usuario_nuevo: anterior.usuario,
       estado_anterior: anterior.estado,
       estado_nuevo: false,
       operacion: 'DELETE',

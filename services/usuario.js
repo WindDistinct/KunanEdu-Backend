@@ -9,6 +9,7 @@ async function registrarAuditoriaUsuario({
   estado_anterior, estado_nuevo,
   password_anterior, password_nuevo,
   rol_anterior, rol_nuevo,
+  empleado_anterior,empleado_nuevo,
   operacion,
   usuario_modificador
 }) {
@@ -21,11 +22,12 @@ async function registrarAuditoriaUsuario({
       estado_anterior, estado_nuevo,
       password_anterior, password_nuevo,
       rol_anterior, rol_nuevo,
+      empleado_anterior,empleado_nuevo,
       operacion,
       fecha_modificacion,
       usuario_modificador
     )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12,$13,$14)
   `;
 
   const values = [
@@ -34,6 +36,7 @@ async function registrarAuditoriaUsuario({
     estado_anterior, estado_nuevo,
     password_anterior, password_nuevo,
     rol_anterior, rol_nuevo,
+    empleado_anterior,empleado_nuevo,
     operacion,
     fecha,
     usuario_modificador
@@ -85,17 +88,17 @@ async function obtenerTodosLosUsuariosAudit() {
 
 // Insertar usuario
 async function insertarUsuario(datos, usuarioModificador) {
-  const { username, password, rol } = datos;
+  const { username, password, rol,empleado } = datos;
   const hashedPassword = await encrypt(password);
 
   const sqlInsert = `
-    INSERT INTO tb_usuario (username, estado, password, rol)
-    VALUES ($1, true, $2, $3)
+    INSERT INTO tb_usuario (username, estado, password, rol,empleado)
+    VALUES ($1, true, $2, $3,$4)
     RETURNING id_usuario
   `;
 
   try {
-    const result = await pool.query(sqlInsert, [username, hashedPassword, rol]);
+    const result = await pool.query(sqlInsert, [username, hashedPassword, rol,empleado]);
     const id_usuario = result.rows[0].id_usuario;
 
     await registrarAuditoriaUsuario({
@@ -108,6 +111,8 @@ async function insertarUsuario(datos, usuarioModificador) {
       password_nuevo: hashedPassword,
       rol_anterior: null,
       rol_nuevo: rol,
+      empleado_anterior:null,
+      empleado_nuevo:empleado,
       operacion: 'INSERT',
       usuario_modificador: usuarioModificador.usuario
     });
@@ -143,7 +148,7 @@ async function loginUsuario({ username, password }) {
 
 // Actualizar usuario
 async function actualizarUsuario(id, datos, usuarioModificador) {
-  const { username, password, rol, estado } = datos;
+  const { username, password, rol, estado,empleado } = datos;
 
   try {
     const resultAnterior = await pool.query(
@@ -165,14 +170,15 @@ async function actualizarUsuario(id, datos, usuarioModificador) {
 
     const sqlUpdate = `
       UPDATE tb_usuario
-      SET username = $1, password = $2, rol = $3, estado = $4
-      WHERE id_usuario = $5
+      SET username = $1, password = $2, rol = $3,empleado=$4, estado = $5
+      WHERE id_usuario = $6
     `;
 
     await pool.query(sqlUpdate, [
       username,
       hashedPassword,
       rol,
+      empleado,
       estado,
       id,
     ]);
@@ -187,6 +193,8 @@ async function actualizarUsuario(id, datos, usuarioModificador) {
       password_nuevo: hashedPassword,
       rol_anterior: anterior.rol,
       rol_nuevo: rol,
+      empleado_anterior:anterior.empleado,
+      empleado_nuevo:empleado,
       operacion: "UPDATE",
       usuario_modificador: usuarioModificador.usuario,
     });
@@ -227,6 +235,8 @@ async function eliminarUsuario(id, usuarioModificador) {
       password_nuevo: anterior.password,
       rol_anterior: anterior.rol,
       rol_nuevo: anterior.rol,
+      empleado_anterior:anterior.empleado,
+      empleado_nuevo:anterior.empleado,
       operacion: 'DELETE',
       usuario_modificador: usuarioModificador.usuario
     });
