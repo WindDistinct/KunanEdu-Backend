@@ -19,6 +19,16 @@ const listarAuditoria = async (req, res) => {
         res.status(500).json({ error: error.message });
       }
 };
+const listarAlumnoAula = async (req, res) => {
+   const { aula } = req.params;
+  
+    try {
+      const estudiantes = await estudianteService.obtenerAlumnosAula(parseInt(aula));
+      res.json(estudiantes);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+};
 const listarTodo = async (req, res) => {
     try {
         const estudiantes = await estudianteService.obtenerTodosLosAlumnos();
@@ -55,4 +65,4 @@ const actualizar= async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   };
-module.exports = { listado ,actualizar,eliminar,insertar,listarAuditoria,listarTodo};
+module.exports = { listarAlumnoAula,listado ,actualizar,eliminar,insertar,listarAuditoria,listarTodo};
