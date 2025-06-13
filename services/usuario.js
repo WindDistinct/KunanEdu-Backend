@@ -150,7 +150,7 @@ async function loginUsuario({ username, password }) {
 
     const token = await tokensign(row);
 
-    return { token, username: row.username, rol: row.rol };
+    return { token, username: row.username, rol: row.rol,usuario:row.empleado };
   } catch (err) {
     console.error("❌ Error en login:", err);
     throw err;
