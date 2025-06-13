@@ -25,6 +25,14 @@ const listarTodo = async (_req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const crearMultiples = async (req, res) => {
+  try {
+    const resultado = await examenService.insertarMultiplesNotas(req.body, req.user);
+    res.json({ mensaje: "Notas creadas correctamente", resultado });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 const listarNotasAlumno = async (req, res) => {
   try {
     const examen = await examenService.obtenerExamenesAlumno(req.params.id);
@@ -67,5 +75,5 @@ module.exports = {
   listarAuditoria,
   actualizar, 
   listarNotasAlumno,
-  eliminar,listarTodo
+  eliminar,listarTodo,crearMultiples
 };

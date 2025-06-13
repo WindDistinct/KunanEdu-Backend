@@ -91,6 +91,44 @@ async function obtenerExamenes() {
     throw err;
   }
 }
+async function insertarMultiplesNotas(listaNotas, usuarioModificador) {
+  const resultados = [];
+
+  for (const datos of listaNotas) {
+    const { matricula, cursoseccion, bimestre, nota } = datos;
+
+    const sqlInsert = `
+      INSERT INTO tb_examen (matricula, curso_seccion, bimestre, nota, estado)
+      VALUES ($1, $2, $3, $4, true)
+      RETURNING id_examen
+    `;
+
+    const result = await pool.query(sqlInsert, [matricula, cursoseccion, bimestre, nota]);
+    const id_examen = result.rows[0].id_examen;
+
+    await registrarAuditoriaExamen({
+      id_examen,
+      matricula_anterior: null,
+      matricula_nuevo: matricula,
+      curso_seccion_anterior: null,
+      curso_seccion_nuevo: cursoseccion,
+      bimestre_anterior: null,
+      bimestre_nuevo: bimestre,
+      nota_anterior: null,
+      nota_nuevo: nota,
+      estado_anterior: null,
+      estado_nuevo: true,
+      operacion: 'INSERT',
+      usuario: usuarioModificador.usuario
+    });
+
+    resultados.push({ id_examen, matricula, cursoseccion, bimestre, nota });
+  }
+
+  return resultados;
+}
+
+
 
 // Obtener todos los exámenes
 async function obtenerTodosLosExamenes() {
@@ -235,7 +273,7 @@ module.exports = {
   insertarExamen,
   obtenerExamenes,
   obtenerTodosLosExamenes,
-  actualizarExamen,
+  actualizarExamen,insertarMultiplesNotas,
   eliminarExamen,
   obtenerExamenesAlumno,
   obtenerTodosLosExamenesAuditoria
