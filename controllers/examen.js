@@ -33,6 +33,16 @@ const crearMultiples = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const listarNotasBimestre = async (req, res) => {
+   const { aula,bimestre } = req.params;
+  
+    try {
+      const notas = await examenService.obtenerNotasPorBimestre(parseInt(aula),bimestre);
+      res.json(notas);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+};
 const listarNotasAlumno = async (req, res) => {
   try {
     const examen = await examenService.obtenerExamenesAlumno(req.params.id);
@@ -75,5 +85,5 @@ module.exports = {
   listarAuditoria,
   actualizar, 
   listarNotasAlumno,
-  eliminar,listarTodo,crearMultiples
+  eliminar,listarTodo,crearMultiples,listarNotasBimestre
 };

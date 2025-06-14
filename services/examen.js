@@ -91,6 +91,28 @@ async function obtenerExamenes() {
     throw err;
   }
 }
+async function obtenerNotasPorBimestre(aula,bimestre) {
+   const sql = `
+  select  x.nota, m.id_matricula,l.id_alumno,l.nombre ||' '||l.apellido_paterno||' '||l.apellido_materno ||' '||m.id_matricula as nombre_completo ,a.numero_aula as numero_aula, s.nombre ||' '|| g.anio ||' '||g.nivel as seccion, p.anio as periodo from tb_matricula m
+JOIN tb_seccion s ON m.seccion=s.id_seccion
+JOIN tb_periodo_escolar p ON s.periodo=p.id_periodo
+JOIN tb_grado g ON s.grado=g.id_grado
+JOIN tb_aula a ON s.aula=a.id_aula
+JOIN tb_alumno l ON m.alumno=l.id_alumno
+JOIN tb_examen x ON m.id_matricula=x.matricula
+WHERE m.condicion='Matriculado' AND s.estado=true AND a.numero_aula=$1 AND x.bimestre=$2
+
+
+  `;
+  try {
+    const result = await pool.query(sql, [aula,bimestre]);
+    return result.rows;
+  } catch (err) {
+    console.error("❌ Error al obtener los alumnos:", err);
+    throw err;
+  }
+}
+
 async function insertarMultiplesNotas(listaNotas, usuarioModificador) {
   const resultados = [];
 
@@ -271,6 +293,7 @@ async function eliminarExamen(id, usuarioModificador) {
 
 module.exports = {
   insertarExamen,
+  obtenerNotasPorBimestre,
   obtenerExamenes,
   obtenerTodosLosExamenes,
   actualizarExamen,insertarMultiplesNotas,
