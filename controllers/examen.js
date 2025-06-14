@@ -34,10 +34,10 @@ const crearMultiples = async (req, res) => {
   }
 };
 const listarNotasBimestre = async (req, res) => {
-   const { aula,bimestre } = req.params;
+   const { aula,bimestre,cursoseccion } = req.params;
   
     try {
-      const notas = await examenService.obtenerNotasPorBimestre(parseInt(aula),bimestre);
+      const notas = await examenService.obtenerNotasPorBimestre(parseInt(aula),bimestre,parseInt(cursoseccion));
       res.json(notas);
     } catch (error) {
       res.status(500).json({ error: error.message });

@@ -91,21 +91,31 @@ async function obtenerExamenes() {
     throw err;
   }
 }
-async function obtenerNotasPorBimestre(aula,bimestre) {
+async function obtenerNotasPorBimestre(aula,bimestre,cursoseccion) {
    const sql = `
-  select  x.nota, m.id_matricula,l.id_alumno,l.nombre ||' '||l.apellido_paterno||' '||l.apellido_materno ||' '||m.id_matricula as nombre_completo ,a.numero_aula as numero_aula, s.nombre ||' '|| g.anio ||' '||g.nivel as seccion, p.anio as periodo from tb_matricula m
-JOIN tb_seccion s ON m.seccion=s.id_seccion
-JOIN tb_periodo_escolar p ON s.periodo=p.id_periodo
-JOIN tb_grado g ON s.grado=g.id_grado
-JOIN tb_aula a ON s.aula=a.id_aula
-JOIN tb_alumno l ON m.alumno=l.id_alumno
-JOIN tb_examen x ON m.id_matricula=x.matricula
-WHERE m.condicion='Matriculado' AND s.estado=true AND a.numero_aula=$1 AND x.bimestre=$2
-
+  SELECT 
+      x.nota,
+      m.id_matricula,
+      l.id_alumno,
+      l.nombre || ' ' || l.apellido_paterno || ' ' || l.apellido_materno AS nombre_completo,
+      a.numero_aula,
+      s.nombre || ' ' || g.anio || ' ' || g.nivel AS seccion,
+      p.anio AS periodo
+    FROM tb_examen x
+    JOIN tb_matricula m ON x.matricula = m.id_matricula
+    JOIN tb_alumno l ON m.alumno = l.id_alumno
+    JOIN tb_seccion s ON m.seccion = s.id_seccion
+    JOIN tb_aula a ON s.aula = a.id_aula
+    JOIN tb_grado g ON s.grado = g.id_grado
+    JOIN tb_periodo_escolar p ON s.periodo = p.id_periodo
+    WHERE m.condicion = 'Matriculado'
+      AND s.estado = true
+      AND a.numero_aula=$1 AND x.bimestre=$2
+      AND x.curso_seccion = $3
 
   `;
   try {
-    const result = await pool.query(sql, [aula,bimestre]);
+    const result = await pool.query(sql, [aula,bimestre,cursoseccion]);
     return result.rows;
   } catch (err) {
     console.error("❌ Error al obtener los alumnos:", err);
