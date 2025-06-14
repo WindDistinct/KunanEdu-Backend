@@ -124,7 +124,19 @@ async function obtenerSecciones() {
     throw err;
   }
 }
+async function obtenerSeccionesPorGradoPeriodo(grado,periodo) {
+   const sql = `
+ SELECT * FROM tb_seccion WHERE grado = $1 AND periodo = $2 AND estado = true;
 
+  `;
+  try {
+    const result = await pool.query(sql, [grado,periodo]);
+    return result.rows;
+  } catch (err) {
+    console.error("❌ Error al obtener las secciones:", err);
+    throw err;
+  }
+}
 // Obtener todas las secciones
 async function obtenerTodasLasSecciones() {
     const sql = `
@@ -271,5 +283,6 @@ module.exports = {
   obtenerTodasLasSecciones,
   actualizarSeccion,
   eliminarSeccion,
+  obtenerSeccionesPorGradoPeriodo,
   obtenerTodasLasSeccionesAuditoria
 };
