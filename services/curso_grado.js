@@ -114,7 +114,7 @@ async function obtenerCursoPorGrado(id) {
       FROM tb_curso_grado S
       JOIN tb_curso a ON s.curso = a.id_curso
       JOIN tb_grado g ON s.grado = g.id_grado
-      WHERE a.estado =  true AND s.grado=$1  
+      WHERE s.estado =  true AND s.grado=$1  
     `;
  
  
