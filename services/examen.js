@@ -126,6 +126,7 @@ async function obtenerNotasPorCurso(docente,periodo,cursoseccion) {
    const sql = `
 SELECT  
 e.id_examen,
+cs.id_curso_seccion,
 m.id_matricula,
 e.estado,
   a.id_alumno,
