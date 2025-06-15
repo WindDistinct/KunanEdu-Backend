@@ -126,6 +126,8 @@ async function obtenerNotasPorCurso(docente,periodo,cursoseccion) {
    const sql = `
 SELECT  
 e.id_examen,
+m.id_matricula,
+e.estado,
   a.id_alumno,
   a.nombre || ' ' || a.apellido_paterno || ' ' || a.apellido_materno AS nombre_completo,
   c.nombre_curso,
@@ -312,11 +314,15 @@ async function eliminarExamen(id, usuarioModificador) {
 
     const anterior = resultAnterior.rows[0];
 
-    await pool.query(
-      "UPDATE tb_examen SET estado = false WHERE id_examen = $1",
-      [id]
-    );
+      const sqlUpdate = `
+      UPDATE tb_examen
+      SET estado = false
+      WHERE id_examen = $1
+    `;
 
+    await pool.query(sqlUpdate, [id]);
+
+     
     await registrarAuditoriaExamen({
       id_examen: id,
       matricula_anterior: anterior.curso,
