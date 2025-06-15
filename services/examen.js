@@ -122,6 +122,44 @@ async function obtenerNotasPorBimestre(aula,bimestre,cursoseccion) {
     throw err;
   }
 }
+async function obtenerNotasPorCurso(docente,periodo,cursoseccion) {
+   const sql = `
+SELECT  
+  a.id_alumno,
+  a.nombre || ' ' || a.apellido_paterno || ' ' || a.apellido_materno AS nombre_completo,
+  c.nombre_curso,
+  e.nota,
+  e.bimestre, 
+  s.nombre AS seccion,
+  g.nivel,
+  doc.id_emp,
+  g.anio, 
+  au.numero_aula
+FROM tb_examen e
+JOIN tb_matricula m ON e.matricula = m.id_matricula
+JOIN tb_alumno a ON m.alumno = a.id_alumno
+JOIN tb_curso_seccion cs ON e.curso_seccion = cs.id_curso_seccion 
+JOIN tb_empleado doc ON cs.docente = doc.id_emp
+JOIN tb_seccion s ON m.seccion = s.id_seccion 
+JOIN tb_grado g ON s.grado = g.id_grado
+JOIN tb_aula au ON s.aula = au.id_aula
+JOIN tb_curso_grado cg 
+  ON cs.curso = cg.curso 
+  AND s.grado = cg.grado
+  JOIN tb_curso c ON cg.curso = c.id_curso
+JOIN tb_periodo_escolar pe ON s.periodo = pe.id_periodo
+WHERE m.condicion = 'Matriculado' AND s.estado = true
+AND doc.id_emp=$1 AND pe.id_periodo=$2 AND cs.id_curso_seccion=$3
+
+  `;
+  try {
+    const result = await pool.query(sql, [docente,periodo,cursoseccion]);
+    return result.rows;
+  } catch (err) {
+    console.error("❌ Error al obtener las notas por curso:", err);
+    throw err;
+  }
+}
 
 async function insertarMultiplesNotas(listaNotas, usuarioModificador) {
   const resultados = [];
@@ -303,6 +341,7 @@ async function eliminarExamen(id, usuarioModificador) {
 
 module.exports = {
   insertarExamen,
+  obtenerNotasPorCurso,
   obtenerNotasPorBimestre,
   obtenerExamenes,
   obtenerTodosLosExamenes,

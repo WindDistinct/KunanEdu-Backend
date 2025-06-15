@@ -43,6 +43,16 @@ const listarNotasBimestre = async (req, res) => {
       res.status(500).json({ error: error.message });
     }
 };
+const listarNotasCurso = async (req, res) => {
+   const { docente,periodo,cursoseccion } = req.params;
+  
+    try {
+      const notas = await examenService.obtenerNotasPorCurso(parseInt(docente),parseInt(periodo),parseInt(cursoseccion));
+      res.json(notas);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+};
 const listarNotasAlumno = async (req, res) => {
   try {
     const examen = await examenService.obtenerExamenesAlumno(req.params.id);
@@ -81,6 +91,7 @@ const eliminar = async (req, res) => {
 
 module.exports = {
   insertar,
+  listarNotasCurso,
   listado,
   listarAuditoria,
   actualizar, 
