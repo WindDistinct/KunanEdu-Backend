@@ -270,7 +270,7 @@ async function actualizarExamen(id, datos, usuarioModificador) {
 
     const sqlUpdate = `
       UPDATE tb_examen
-      SET matricula = $1, cursoseccion = $2, bimestre = $3, nota = $4, estado = $5
+      SET matricula = $1, curso_seccion = $2, bimestre = $3, nota = $4, estado = $5
       WHERE id_examen = $6
     `;
 
