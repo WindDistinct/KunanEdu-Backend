@@ -48,7 +48,7 @@ async function insertarExamen(datos, usuarioModificador) {
   const { matricula, cursoseccion, bimestre, nota } = datos;
 
   const sqlInsert = `
-    INSERT INTO tb_examen (matricula, cursoseccion, bimestre, nota, estado)
+    INSERT INTO tb_examen (matricula, curso_seccion, bimestre, nota, estado)
     VALUES ($1, $2, $3, $4, true)
     RETURNING id_examen
   `;
@@ -60,9 +60,9 @@ async function insertarExamen(datos, usuarioModificador) {
     await registrarAuditoriaExamen({
       id_examen,
       matricula_anterior: null,
-      matricula_nuevo: curso,
+      matricula_nuevo: matricula,
       curso_seccion_anterior: null,
-      curso_seccion_nuevo: seccion,
+      curso_seccion_nuevo: cursoseccion,
       bimestre_anterior: null,
       bimestre_nuevo: bimestre,
       nota_anterior: null,
@@ -280,10 +280,10 @@ async function actualizarExamen(id, datos, usuarioModificador) {
 
     await registrarAuditoriaExamen({
       id_examen: id,
-      matricula_anterior: anterior.curso,
-      matricula_nuevo: curso,
-      curso_seccion_anterior: anterior.seccion,
-      curso_seccion_nuevo: seccion,
+      matricula_anterior: anterior.matricula,
+      matricula_nuevo: matricula,
+      curso_seccion_anterior: anterior.cursoseccion,
+      curso_seccion_nuevo: cursoseccion,
       bimestre_anterior: anterior.bimestre,
       bimestre_nuevo: bimestre,
       nota_anterior: anterior.nota,
@@ -326,10 +326,10 @@ async function eliminarExamen(id, usuarioModificador) {
      
     await registrarAuditoriaExamen({
       id_examen: id,
-      matricula_anterior: anterior.curso,
-      matricula_nuevo: anterior.curso,
-      curso_seccion_anterior: anterior.seccion,
-      curso_seccion_nuevo: anterior.seccion,
+      matricula_anterior: anterior.matricula,
+      matricula_nuevo: anterior.matricula,
+      curso_seccion_anterior: anterior.cursoseccion,
+      curso_seccion_nuevo: anterior.cursoseccion,
       bimestre_anterior: anterior.bimestre,
       bimestre_nuevo: anterior.bimestre,
       nota_anterior: anterior.nota,
