@@ -22,6 +22,7 @@ const asistenciaRouter = require("./routes/asistencia");
 const horarioRouter = require("./routes/horario");
 const curso_gradoRouter = require("./routes/curso_grado");
 const curso_seccionRouter = require("./routes/curso_seccion");
+const notaRouter = require("./routes/nota");
 
 
 // Middleware
@@ -45,13 +46,14 @@ app.use("/api/asistencia", asistenciaRouter);
 app.use("/api/horario", horarioRouter);
 app.use("/api/curso_grado", curso_gradoRouter);
 app.use("/api/curso_seccion", curso_seccionRouter);
+app.use("/api/nota", notaRouter);
 
 
 
 // Ping periódico cada 10 minutos a tu propia URL de Render
 cron.schedule("*/10 * * * *", async () => {
   try {
-    const response = await axios.get("https://kunanedu-backend.onrender.com/api/usuario/all"); 
+    const response = await axios.get("https://kunanedu-backend.onrender.com/api/usuario/all");
     console.log("Ping exitoso:", response.status);
   } catch (error) {
     console.error("Error al hacer ping:", error.message);
