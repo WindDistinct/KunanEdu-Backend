@@ -141,6 +141,25 @@ async function obtenerAlumnosAula(aula,cursoseccion) {
   }
 }
 
+// obtener alumnos por periodo
+async function obtenerAlumnosPorPeriodo(idPeriodo) {
+  const sql = `
+    SELECT DISTINCT a.id_alumno, a.nombre, a.apellido_paterno, a.apellido_materno,
+           a.dni, a.direccion, a.telefono, a.fecha_nacimiento, a.estado
+    FROM tb_alumno a
+    JOIN tb_matricula m ON a.id_alumno = m.alumno
+    JOIN tb_seccion s ON m.seccion = s.id_seccion
+    WHERE s.periodo = $1 AND m.condicion = 'Matriculado'
+  `;
+  try {
+    const result = await pool.query(sql, [idPeriodo]);
+    return result.rows;
+  } catch (err) {
+    console.error("❌ Error al obtener alumnos por periodo:", err);
+    throw err;
+  }
+}
+
 
 // Obtener todos los alumnos
 async function obtenerTodosLosAlumnos() {
