@@ -162,6 +162,7 @@ async function obtenerAlumnosPorPeriodo(idPeriodo) {
 
 
 
+
 // Obtener todos los alumnos
 async function obtenerTodosLosAlumnos() {
   const sql = "SELECT * FROM tb_alumno";
