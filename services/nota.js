@@ -5,14 +5,17 @@ async function insertarNota(datos, usuarioModificador) {
     const { id_examen, id_matricula, nota } = datos;
 
     const sqlInsert = `
-        INSERT INTO tb_nota (id_examen, id_matricula, nota, estado)
-        VALUES ($1, $2, $3, true)
-        RETURNING id_nota
-    `;
+    INSERT INTO tb_nota (id_examen, id_matricula, nota, estado)
+    VALUES ($1, $2, $3, true)
+    RETURNING id_nota
+  `;
 
     try {
-        const result = await pool.query(sqlInsert, [id_examen, id_matricula, nota]);
+        const result = await pool.query(sqlInsert, [
+            id_examen, id_matricula, nota
+        ]);
         const id_nota = result.rows[0].id_nota;
+
         return { mensaje: "Nota insertada y auditada", id: id_nota };
     } catch (err) {
         console.error("❌ Error al insertar nota:", err);
@@ -20,7 +23,7 @@ async function insertarNota(datos, usuarioModificador) {
     }
 }
 
-// Obtener notas activas
+// Obtener nota activas
 async function obtenerNotas() {
     const sql = "SELECT * FROM tb_nota WHERE estado = true";
     try {
@@ -32,7 +35,7 @@ async function obtenerNotas() {
     }
 }
 
-// Obtener todas las notas
+// Obtener todas las nota
 async function obtenerTodasLasNotas() {
     const sql = "SELECT * FROM tb_nota";
     try {
@@ -46,22 +49,31 @@ async function obtenerTodasLasNotas() {
 
 // Actualizar nota
 async function actualizarNota(id, datos, usuarioModificador) {
+
     const { id_matricula, id_examen, nota, estado } = datos;
 
     try {
-        const resultAnterior = await pool.query("SELECT * FROM tb_nota WHERE id_nota = $1", [id]);
+        const resultAnterior = await pool.query(
+            "SELECT * FROM tb_nota WHERE id_nota = $1",
+            [id]
+        );
 
         if (resultAnterior.rowCount === 0) {
             throw new Error("Nota no encontrada");
         }
 
-        const sqlUpdate = `
-            UPDATE tb_nota
-            SET id_matricula = $1, id_examen = $2, nota = $3, estado = $4
-            WHERE id_nota = $5
-        `;
+        const anterior = resultAnterior.rows[0];
 
-        await pool.query(sqlUpdate, [id_matricula, id_examen, nota, estado, id]);
+        const sqlUpdate = `
+      UPDATE tb_nota
+      SET id_matricula = $1, id_examen = $2, nota = $3, estado = $4
+      WHERE id_nota = $5
+    `;
+
+        await pool.query(sqlUpdate, [
+            id_matricula, id_examen, nota, estado, id
+        ]);
+
         return { mensaje: "Nota actualizada y auditada" };
     } catch (err) {
         console.error("❌ Error al actualizar nota:", err);
@@ -72,13 +84,20 @@ async function actualizarNota(id, datos, usuarioModificador) {
 // Eliminar nota (borrado lógico)
 async function eliminarNota(id, usuarioModificador) {
     try {
-        const resultAnterior = await pool.query("SELECT * FROM tb_nota WHERE id_nota = $1", [id]);
+        const resultAnterior = await pool.query(
+            "SELECT * FROM tb_nota WHERE id_nota = $1",
+            [id]
+        );
 
         if (resultAnterior.rowCount === 0) {
             throw new Error("Nota no encontrada");
         }
 
-        await pool.query("UPDATE tb_nota SET estado = false WHERE id_nota = $1", [id]);
+        await pool.query(
+            "UPDATE tb_nota SET estado = false WHERE id_nota = $1",
+            [id]
+        );
+
         return { mensaje: "Nota eliminada (estado = false)" };
     } catch (err) {
         console.error("❌ Error al eliminar nota:", err);
@@ -86,62 +105,32 @@ async function eliminarNota(id, usuarioModificador) {
     }
 }
 
-// Generar reporte completo por alumno y periodo
-async function generarReporte(periodoId, alumnoId) {
-    const sqlMatricula = `
-        SELECT s.nombre AS seccion, g.nombre_grado AS grado
-        FROM tb_matricula m
-        JOIN tb_seccion s ON m.id_seccion = s.id_seccion
-        JOIN tb_grado g ON s.id_grado = g.id_grado
-        WHERE m.id_alumno = $1
-          AND s.id_periodo = $2
-          AND m.condicion = 'Matriculado'
-          AND m.estado = true
-          AND s.estado = true
-        LIMIT 1
-    `;
-
-    let seccionNombre = "", gradoNombre = "";
-
-    try {
-        const matriculaRes = await pool.query(sqlMatricula, [alumnoId, periodoId]);
-
-        if (matriculaRes.rows.length === 0) {
-            throw new Error("No se encontró matrícula activa para este alumno en ese periodo.");
-        }
-
-        seccionNombre = matriculaRes.rows[0].seccion;
-        gradoNombre = matriculaRes.rows[0].grado;
-    } catch (err) {
-        console.error("❌ Error al obtener matrícula del alumno:", err);
-        throw err;
-    }
-
+async function generarReporte(periodo, grado, seccion, alumnoId) {
     const sql = `
-        SELECT 
-            c.nombre_curso AS curso,
-            e.bimestre,
-            n.nota
-        FROM tb_nota n
-        JOIN tb_examen e ON n.id_examen = e.id_examen
-        JOIN tb_matricula m ON n.id_matricula = m.id_matricula
-        JOIN tb_alumno a ON m.id_alumno = a.id_alumno
-        JOIN tb_seccion s ON m.id_seccion = s.id_seccion
-        JOIN tb_grado g ON s.id_grado = g.id_grado
-        JOIN tb_curso_seccion cs ON e.id_curso_seccion = cs.id_curso_seccion
-        JOIN tb_curso c ON cs.id_curso = c.id_curso
-        WHERE 
-            a.id_alumno = $1
-            AND s.nombre = $2
-            AND g.nombre_grado = $3
-            AND s.id_periodo = $4
-            AND m.condicion = 'Matriculado'
-            AND s.estado = true
-            AND n.estado = true
+      SELECT 
+        c.nombre_curso AS curso,
+        e.bimestre,
+        n.nota
+      FROM tb_nota n
+      JOIN tb_examen e ON n.examen = e.id_examen
+      JOIN tb_curso_seccion cs ON e.curso_seccion = cs.id_curso_seccion
+      JOIN tb_curso_grado cg ON cs.curso = cg.curso
+      JOIN tb_curso c ON cg.curso = c.id_curso
+      JOIN tb_matricula m ON m.alumno = n.alumno
+      JOIN tb_seccion s ON m.seccion = s.id_seccion
+      JOIN tb_grado g ON s.grado = g.id_grado
+      WHERE 
+        n.alumno = $1
+        AND g.anio = $2
+        AND s.nombre = $3
+        AND s.periodo = $4
+        AND m.condicion = 'Matriculado'
+        AND s.estado = true
+        AND n.estado = true
     `;
 
     try {
-        const result = await pool.query(sql, [alumnoId, seccionNombre, gradoNombre, periodoId]);
+        const result = await pool.query(sql, [alumnoId, grado, seccion, periodo]);
         const rows = result.rows;
 
         const reporte = {
@@ -157,21 +146,29 @@ async function generarReporte(periodoId, alumnoId) {
         let cantidadNotas = 0;
 
         for (const { curso, bimestre, nota } of rows) {
+            // Inicializar estructura por curso
             if (!reporte.Curso[curso]) {
                 reporte.Curso[curso] = { Notas: {}, Promedio: 0, Estado: "" };
             }
 
+            // Agregar nota por bimestre
             reporte.Curso[curso].Notas[`Bimestre ${bimestre}`] = nota;
-            reporte.Curso[curso].Promedio += nota;
 
+            // Acumular nota para promedio del curso
+            reporte.Curso[curso].Promedio += nota;
+            const notasCurso = Object.keys(reporte.Curso[curso].Notas).length;
+
+            // Acumular por bimestre general
             bimestresAcumulados[bimestre] = bimestresAcumulados[bimestre] || { suma: 0, count: 0 };
             bimestresAcumulados[bimestre].suma += nota;
             bimestresAcumulados[bimestre].count++;
 
+            // Acumulado global
             sumaTotal += nota;
             cantidadNotas++;
         }
 
+        // Calcular promedios y estado por curso
         for (const curso in reporte.Curso) {
             const data = reporte.Curso[curso];
             const cantidad = Object.keys(data.Notas).length;
@@ -179,16 +176,18 @@ async function generarReporte(periodoId, alumnoId) {
             data.Estado = data.Promedio >= 11 ? "Aprobado" : "Desaprobado";
         }
 
+        // Calcular promedio por bimestre general
         for (const bimestre in bimestresAcumulados) {
             const { suma, count } = bimestresAcumulados[bimestre];
             reporte["Promedios Generales"]["Por Bimestre"][`Bimestre ${bimestre}`] = parseFloat((suma / count).toFixed(2));
         }
 
+        // Promedio total general
         reporte["Promedios Generales"]["Promedio Total"] = parseFloat((sumaTotal / cantidadNotas).toFixed(2));
 
         return reporte;
     } catch (err) {
-        console.error("❌ Error al generar el reporte final:", err);
+        console.error("❌ Error al generar el reporte:", err);
         throw err;
     }
 }
@@ -196,8 +195,9 @@ async function generarReporte(periodoId, alumnoId) {
 module.exports = {
     insertarNota,
     obtenerNotas,
+    generarReporte,
+    // obtenerTodasLasNotasAudit,
     obtenerTodasLasNotas,
     actualizarNota,
-    eliminarNota,
-    generarReporte
+    eliminarNota
 };
