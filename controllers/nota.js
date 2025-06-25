@@ -17,6 +17,7 @@ const listar = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
 const listarTodo = async (req, res) => {
     try {
         const notas = await notaService.obtenerTodasLasNotas();
@@ -25,6 +26,7 @@ const listarTodo = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
 // const listarAuditoria = async (req, res) => {
 //     try {
 //         const notas = await notaService.obtenerTodasLasNotasAudit();
@@ -55,10 +57,10 @@ const eliminar = async (req, res) => {
 };
 
 const generar = async (req, res) => {
-    const { periodo, grado, seccion, alumno } = req.params;
+    const { periodo, alumno } = req.params;
 
     try {
-        const reporte = await reporteService.generarReporte(periodo, grado, seccion, alumno);
+        const reporte = await notaService.generarReporte(periodo, alumno);
         res.json(reporte);
     } catch (error) {
         console.error("❌ Error en controlador de reporte:", error);
