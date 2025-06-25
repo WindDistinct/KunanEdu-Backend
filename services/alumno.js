@@ -149,7 +149,7 @@ async function obtenerAlumnosPorPeriodo(idPeriodo) {
     FROM tb_alumno a
     JOIN tb_matricula m ON a.id_alumno = m.alumno
     JOIN tb_seccion s ON m.seccion = s.id_seccion
-    WHERE s.id_periodo = $1 AND m.condicion = 'Matriculado'
+    WHERE s.periodo = $1 AND m.condicion = 'Matriculado'
   `;
   try {
     const result = await pool.query(sql, [idPeriodo]);
