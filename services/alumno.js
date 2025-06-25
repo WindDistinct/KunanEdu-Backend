@@ -300,5 +300,6 @@ module.exports = {
   actualizarAlumno,
   eliminarAlumno,
   obtenerAlumnosAula,
-  obtenerTodosLosAlumnosAudit
+  obtenerTodosLosAlumnosAudit, 
+   obtenerAlumnosPorPeriodo
 };
