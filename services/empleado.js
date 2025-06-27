@@ -72,7 +72,7 @@ async function insertarEmpleado(datos, usuarioModificador) {
 
     const existeEmpleado = await pool.query(
     'SELECT id_emp FROM tb_empleado WHERE numero_documento = $1',
-    [dni]
+    [numero_documento]
     );
     if (existeEmpleado.rowCount > 0) {
       throw new Error("El empleado con este numero documento ya está registrad");
