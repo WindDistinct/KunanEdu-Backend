@@ -8,7 +8,7 @@ async function registrarAuditoriaEmpleado({
   ape_mat_emp_anterior, ape_mat_emp_nuevo,
   fec_nac_anterior, fec_nac_nuevo,
   especialidad_anterior, especialidad_nuevo,
-  dni_anterior, dni_nuevo,
+  numero_documento_anterior, numero_documento_nuevo,
   telefono_anterior, telefono_nuevo,
   observacion_anterior, observacion_nuevo,
   cargo_anterior, cargo_nuevo,
@@ -24,7 +24,7 @@ async function registrarAuditoriaEmpleado({
       ape_mat_emp_anterior, ape_mat_emp_nuevo,
       fec_nac_anterior, fec_nac_nuevo,
       especialidad_anterior, especialidad_nuevo,
-      dni_anterior, dni_nuevo,
+      numero_documento_anterior, numero_documento_nuevo,
       telefono_anterior, telefono_nuevo,
       observacion_anterior, observacion_nuevo,
       cargo_anterior, cargo_nuevo,
@@ -45,7 +45,7 @@ async function registrarAuditoriaEmpleado({
     ape_mat_emp_anterior, ape_mat_emp_nuevo,
     fec_nac_anterior, fec_nac_nuevo,
     especialidad_anterior, especialidad_nuevo,
-    dni_anterior, dni_nuevo,
+    numero_documento_anterior, numero_documento_nuevo,
     telefono_anterior, telefono_nuevo,
     observacion_anterior, observacion_nuevo,
     cargo_anterior, cargo_nuevo,
@@ -66,27 +66,27 @@ async function registrarAuditoriaEmpleado({
 async function insertarEmpleado(datos, usuarioModificador) {
   const {
     nombre_emp, ape_pat_emp, ape_mat_emp,
-    fec_nac, especialidad, dni, telefono,
+    fec_nac, especialidad, tipo_documento,numero_documento, telefono,
     observacion, cargo
   } = datos;
 
     const existeEmpleado = await pool.query(
-    'SELECT id_emp FROM tb_empleado WHERE dni = $1',
+    'SELECT id_emp FROM tb_empleado WHERE numero_documento = $1',
     [dni]
     );
     if (existeEmpleado.rowCount > 0) {
-      throw new Error("El empleado con este DNI ya está registrad");
+      throw new Error("El empleado con este numero documento ya está registrad");
     }
     
 
   const sqlInsert = `
     INSERT INTO tb_empleado (
       nombre_emp, ape_pat_emp, ape_mat_emp,
-      fec_nac, especialidad, dni, telefono,
+      fec_nac, especialidad, tipo_documento,numero_documento, telefono,
       observacion, cargo, estado
     ) VALUES (
       $1, $2, $3, $4, $5, $6, $7,
-      $8, $9, true
+      $8, $9,$10, true
     )
     RETURNING id_emp
   `;
@@ -94,7 +94,7 @@ async function insertarEmpleado(datos, usuarioModificador) {
   try {
     const result = await pool.query(sqlInsert, [
       nombre_emp, ape_pat_emp, ape_mat_emp,
-      fec_nac, especialidad, dni, telefono,
+      fec_nac, especialidad, tipo_documento,numero_documento, telefono,
       observacion, cargo
     ]);
     const id_emp = result.rows[0].id_emp;
@@ -111,8 +111,8 @@ async function insertarEmpleado(datos, usuarioModificador) {
       fec_nac_nuevo: fec_nac,
       especialidad_anterior: null,
       especialidad_nuevo: especialidad,
-      dni_anterior: null,
-      dni_nuevo: dni,
+      numero_documento_anterior: null,
+      numero_documento_nuevo: numero_documento,
       telefono_anterior: null,
       telefono_nuevo: telefono,
       observacion_anterior: null,
@@ -231,7 +231,7 @@ async function obtenerTodosLosEmpleadosAuditoria() {
 async function actualizarEmpleado(id, datos, usuarioModificador) {
   let {
     nombre_emp, ape_pat_emp, ape_mat_emp,
-    fec_nac, especialidad, dni, telefono,
+    fec_nac, especialidad, tipo_documento, numero_documento,telefono,
     observacion, cargo, estado
   } = datos;
 
@@ -250,14 +250,14 @@ async function actualizarEmpleado(id, datos, usuarioModificador) {
     const sqlUpdate = `
       UPDATE tb_empleado
       SET nombre_emp = $1, ape_pat_emp = $2, ape_mat_emp = $3,
-          fec_nac = $4, especialidad = $5, dni = $6, telefono = $7,
-          observacion = $8, cargo = $9, estado = $10
-      WHERE id_emp = $11
+          fec_nac = $4, especialidad = $5, tipo_documento = $6, numero_documento= $7,telefono = $8,
+          observacion = $9, cargo = $10, estado = $11
+      WHERE id_emp = $12
     `;
 
     await pool.query(sqlUpdate, [
       nombre_emp, ape_pat_emp, ape_mat_emp,
-      fec_nac, especialidad, dni, telefono,
+      fec_nac, especialidad, tipo_documento,numero_documento, telefono,
       observacion, cargo, estado, id
     ]);
 
@@ -273,8 +273,8 @@ async function actualizarEmpleado(id, datos, usuarioModificador) {
       fec_nac_nuevo: fec_nac,
       especialidad_anterior: anterior.especialidad,
       especialidad_nuevo: especialidad,
-      dni_anterior: anterior.dni,
-      dni_nuevo: dni,
+      numero_documento_anterior: anterior.numero_documento,
+      numero_documento_nuevo: numero_documento,
       telefono_anterior: anterior.telefono,
       telefono_nuevo: telefono,
       observacion_anterior: anterior.observacion,
@@ -324,8 +324,8 @@ async function eliminarEmpleado(id, usuarioModificador) {
       fec_nac_nuevo: anterior.fec_nac,
       especialidad_anterior: anterior.especialidad,
       especialidad_nuevo: anterior.especialidad,
-      dni_anterior: anterior.dni,
-      dni_nuevo: anterior.dni,
+      numero_documento_anterior: anterior.numero_documento,
+      numero_documento_nuevo: anterior.numero_documento,
       telefono_anterior: anterior.telefono,
       telefono_nuevo: anterior.telefono,
       observacion_anterior: anterior.observacion,
