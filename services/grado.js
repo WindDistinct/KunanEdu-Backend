@@ -6,6 +6,7 @@ async function registrarAuditoriaGrado({
   nivel_anterior, nivel_nuevo,
   anio_anterior, anio_nuevo,
   estado_anterior, estado_nuevo,
+  observacion,
   operacion, usuario
 }) {
  const fecha = new Date(); 
@@ -14,16 +15,16 @@ async function registrarAuditoriaGrado({
     INSERT INTO tb_audit_grado (
       id_grado, nivel_anterior, nivel_nuevo,
       anio_anterior, anio_nuevo,
-      estado_anterior, estado_nuevo,
+      estado_anterior, estado_nuevo,observacion,
       operacion, fecha_modificacion, usuario_modificador
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10,$11)
   `;
 
   const values = [
     id_grado,
     nivel_anterior, nivel_nuevo,
     anio_anterior, anio_nuevo,
-    estado_anterior, estado_nuevo,
+    estado_anterior, estado_nuevo,observacion,
     operacion, fecha, usuario
   ];
 
@@ -71,6 +72,7 @@ async function insertarGrado(datos, usuarioModificador) {
       anio_nuevo: anio,
       estado_anterior: null,
       estado_nuevo: true,
+      observacion:'Nuevo registro',
       operacion: 'INSERT',
       usuario: usuarioModificador.usuario,
     });
@@ -138,7 +140,7 @@ async function obtenerTodosLosGradosAuditoria() {
 }
 // Actualizar grado
 async function actualizarGrado(id, datos, usuarioModificador) {
-  const { nivel, anio, estado } = datos;
+  const { nivel, anio, estado,observacion } = datos;
 
   try { 
     const resultAnterior = await pool.query(
@@ -164,12 +166,12 @@ async function actualizarGrado(id, datos, usuarioModificador) {
  
     const sqlUpdate = `
       UPDATE tb_grado
-      SET nivel = $1, anio = $2, estado = $3
-      WHERE id_grado = $4
+      SET nivel = $1, anio = $2, estado = $3, observacion = $4
+      WHERE id_grado = $5
     `;
 
     await pool.query(sqlUpdate, [
-      nivel, anio, estado, id
+      nivel, anio, estado,observacion, id
     ]);
  
     await registrarAuditoriaGrado({
@@ -180,6 +182,7 @@ async function actualizarGrado(id, datos, usuarioModificador) {
       anio_nuevo: anio,
       estado_anterior: anterior.estado,
       estado_nuevo: estado,
+      observacion:observacion,
       operacion: 'UPDATE',
       usuario: usuarioModificador.usuario
     });
@@ -218,6 +221,7 @@ async function eliminarGrado(id, usuarioModificador) {
       anio_nuevo: anterior.anio,
       estado_anterior: anterior.estado,
       estado_nuevo: false,
+      observacion:'Registro eliminado',
       operacion: 'DELETE',
       usuario: usuarioModificador.usuario
     });
