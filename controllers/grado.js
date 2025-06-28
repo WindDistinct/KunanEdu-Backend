@@ -57,9 +57,7 @@ module.exports = {
   crear,
   listar,
   listarAuditoria,
-  actualizar,
-  eliminarEstado,
-  listarTodo,
-  eliminarGradoEstado,
+  actualizar, 
+  listarTodo, 
   eliminar
 };
