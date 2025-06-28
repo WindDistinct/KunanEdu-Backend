@@ -42,7 +42,15 @@ const actualizar = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
+const eliminarEstado = async (req, res) => {
+  try {
+    const cambios = await gradoService.eliminarGradoEstado(req.params.id, req.body,req.user);
+    if (cambios === 0) return res.status(404).json({ error: "Grado no encontrado o sin cambios" });
+    res.json({ mensaje: "Grado actualizado" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 const eliminar = async (req, res) => {
   try {
     const eliminado = await gradoService.eliminarGrado(req.params.id,req.user);
@@ -58,6 +66,8 @@ module.exports = {
   listar,
   listarAuditoria,
   actualizar,
+  eliminarEstado,
   listarTodo,
+  eliminarGradoEstado,
   eliminar
 };
