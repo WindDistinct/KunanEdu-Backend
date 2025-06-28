@@ -7,6 +7,7 @@ async function registrarAuditoriaAula({
   aforo_anterior, aforo_nuevo,
   ubicacion_anterior, ubicacion_nueva,
   estado_anterior, estado_nuevo,
+  observacion,
   operacion, usuario
 }) {
  const fecha = new Date(); 
@@ -16,9 +17,9 @@ async function registrarAuditoriaAula({
       id_aula, numero_aula_anterior, numero_aula_nuevo,
       aforo_anterior, aforo_nuevo,
       ubicacion_anterior, ubicacion_nuevo,
-      estado_anterior, estado_nuevo,
+      estado_anterior, estado_nuevo,observacion,
       operacion, fecha_modificacion, usuario_modificador
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
   `;
 
   const values = [
@@ -26,7 +27,7 @@ async function registrarAuditoriaAula({
     numero_anterior, numero_nuevo,
     aforo_anterior, aforo_nuevo,
     ubicacion_anterior, ubicacion_nueva,
-    estado_anterior, estado_nuevo,
+    estado_anterior, estado_nuevo,observacion,
     operacion, fecha, usuario
   ];
 
@@ -73,6 +74,7 @@ async function insertarAula(datos, usuarioModificador) {
       ubicacion_nueva: ubicacion,
       estado_anterior: null,
       estado_nuevo: true,
+       observacion:'Nuevo registro',
       operacion: 'INSERT',
       usuario: usuarioModificador.usuario
     });
@@ -122,7 +124,7 @@ async function obtenerTodasLasAulasAudit() {
 
 // Actualizar aula
 async function actualizarAula(id, datos, usuarioModificador) {
-  const { numero_aula, aforo, ubicacion, estado } = datos;
+  const { numero_aula, aforo, ubicacion, estado,observacion } = datos;
 
   try { 
     const resultAnterior = await pool.query(
@@ -165,6 +167,7 @@ async function actualizarAula(id, datos, usuarioModificador) {
       ubicacion_nueva: ubicacion,
       estado_anterior: anterior.estado,
       estado_nuevo: estado,
+      observacion:observacion,
       operacion: 'UPDATE',
       usuario: usuarioModificador.usuario
     });
@@ -205,6 +208,7 @@ async function eliminarAula(id, usuarioModificador) {
       ubicacion_nueva: anterior.ubicacion,
       estado_anterior: anterior.estado,
       estado_nuevo: false,
+       observacion:'Registro eliminado',
       operacion: 'DELETE',
       usuario: usuarioModificador.usuario
     });
