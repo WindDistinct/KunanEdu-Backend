@@ -4,7 +4,7 @@ const pool = require("../database/db.js");
 async function registrarAuditoriaCurso({
   id_curso,
   nombre_anterior, nombre_nuevo, 
-  estado_anterior, estado_nuevo,
+  estado_anterior, estado_nuevo,observacion,
   operacion, usuario
 }) {
   const fecha = new Date(); 
@@ -12,15 +12,15 @@ async function registrarAuditoriaCurso({
   const sqlAudit = `
     INSERT INTO tb_audit_curso (
       id_curso, nombre_curso_anterior, nombre_curso_nuevo, 
-      estado_anterior, estado_nuevo,
+      estado_anterior, estado_nuevo,observacion,
       operacion, fecha_modificacion, usuario_modificador
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
   `;
 
   const values = [
     id_curso,
     nombre_anterior, nombre_nuevo, 
-    estado_anterior, estado_nuevo,
+    estado_anterior, estado_nuevo,observacion,
     operacion, fecha, usuario
   ];
 
@@ -91,6 +91,7 @@ async function insertarCurso(datos, usuarioModificador) {
       nombre_nuevo: nombre_curso,
       estado_anterior: null,
       estado_nuevo: true,
+      observacion:'Nuevo registro',
       operacion: 'INSERT',
       usuario: usuarioModificador.usuario
     });
@@ -104,7 +105,7 @@ async function insertarCurso(datos, usuarioModificador) {
 
 // Actualizar curso
 async function actualizarCurso(id, datos, usuarioModificador) {
-  const { nombre_curso, estado } = datos;
+  const { nombre_curso, estado,observacion } = datos;
 
   try {
     const resultAnterior = await pool.query(
@@ -144,6 +145,7 @@ async function actualizarCurso(id, datos, usuarioModificador) {
       nombre_nuevo: nombre_curso,
       estado_anterior: anterior.estado,
       estado_nuevo: estado,
+       observacion:observacion,
       operacion: 'UPDATE',
       usuario: usuarioModificador.usuario
     });
@@ -183,6 +185,7 @@ async function eliminarCurso(id, usuarioModificador) {
       nombre_nuevo: anterior.nombre_curso, 
       estado_anterior: anterior.estado,
       estado_nuevo: false,
+      observacion:'Registro eliminado',
       operacion: 'DELETE',
       usuario: usuarioModificador.usuario
     });
