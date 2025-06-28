@@ -167,7 +167,7 @@ async function actualizarAula(id, datos, usuarioModificador) {
       ubicacion_nueva: ubicacion,
       estado_anterior: anterior.estado,
       estado_nuevo: estado,
-      observacion:observacion,
+      observacion:'ACTUALIZAR AULA',
       operacion: 'UPDATE',
       usuario: usuarioModificador.usuario
     });
