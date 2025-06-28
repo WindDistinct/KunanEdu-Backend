@@ -10,7 +10,7 @@ async function registrarAuditoriaEmpleado({
   especialidad_anterior, especialidad_nuevo,
   numero_documento_anterior, numero_documento_nuevo,
   telefono_anterior, telefono_nuevo,
-  observacion_anterior, observacion_nuevo,
+  observacion,
   cargo_anterior, cargo_nuevo,
   estado_anterior, estado_nuevo,
   operacion, usuario
@@ -26,7 +26,7 @@ async function registrarAuditoriaEmpleado({
       especialidad_anterior, especialidad_nuevo,
       numero_documento_anterior, numero_documento_nuevo,
       telefono_anterior, telefono_nuevo,
-      observacion_anterior, observacion_nuevo,
+      observacion,
       cargo_anterior, cargo_nuevo,
       estado_anterior, estado_nuevo,
       operacion, fecha_modificacion, usuario_modificador
@@ -34,7 +34,7 @@ async function registrarAuditoriaEmpleado({
       $1, $2, $3, $4, $5, $6, $7,
       $8, $9, $10, $11, $12, $13,
       $14, $15, $16, $17, $18, $19,
-      $20, $21, $22, $23, $24
+      $20, $21, $22, $23
     )
   `;
 
@@ -47,7 +47,7 @@ async function registrarAuditoriaEmpleado({
     especialidad_anterior, especialidad_nuevo,
     numero_documento_anterior, numero_documento_nuevo,
     telefono_anterior, telefono_nuevo,
-    observacion_anterior, observacion_nuevo,
+    observacion,
     cargo_anterior, cargo_nuevo,
     estado_anterior, estado_nuevo,
     operacion, fecha, usuario
@@ -115,8 +115,7 @@ async function insertarEmpleado(datos, usuarioModificador) {
       numero_documento_nuevo: numero_documento,
       telefono_anterior: null,
       telefono_nuevo: telefono,
-      observacion_anterior: null,
-      observacion_nuevo: observacion,
+      observacion:'Nuevo registro',
       cargo_anterior: null,
       cargo_nuevo: cargo,
       estado_anterior: null,
@@ -251,14 +250,14 @@ async function actualizarEmpleado(id, datos, usuarioModificador) {
       UPDATE tb_empleado
       SET nombre_emp = $1, ape_pat_emp = $2, ape_mat_emp = $3,
           fec_nac = $4, especialidad = $5, tipo_documento = $6, numero_documento= $7,telefono = $8,
-          observacion = $9, cargo = $10, estado = $11
-      WHERE id_emp = $12
+          cargo = $9, estado = $10
+      WHERE id_emp = $11
     `;
 
     await pool.query(sqlUpdate, [
       nombre_emp, ape_pat_emp, ape_mat_emp,
       fec_nac, especialidad, tipo_documento,numero_documento, telefono,
-      observacion, cargo, estado, id
+      cargo, estado, id
     ]);
 
     await registrarAuditoriaEmpleado({
@@ -277,8 +276,7 @@ async function actualizarEmpleado(id, datos, usuarioModificador) {
       numero_documento_nuevo: numero_documento,
       telefono_anterior: anterior.telefono,
       telefono_nuevo: telefono,
-      observacion_anterior: anterior.observacion,
-      observacion_nuevo: observacion,
+      observacion: observacion,
       cargo_anterior: anterior.cargo,
       cargo_nuevo: cargo,
       estado_anterior: anterior.estado,
@@ -328,8 +326,7 @@ async function eliminarEmpleado(id, usuarioModificador) {
       numero_documento_nuevo: anterior.numero_documento,
       telefono_anterior: anterior.telefono,
       telefono_nuevo: anterior.telefono,
-      observacion_anterior: anterior.observacion,
-      observacion_nuevo: anterior.observacion,
+      observacion:'Registro eliminado',
       cargo_anterior: anterior.cargo,
       cargo_nuevo: anterior.cargo,
       estado_anterior: anterior.estado,
