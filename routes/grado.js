@@ -8,7 +8,7 @@ const checkRol = require("../middleware/rol");
 router.post("/create", checkAuth, checkRol('administrador'), crear);
 
 // 2. Rutas PUT específicas (antes que rutas con :id)
-router.put("/eliminar/:idGrado", checkAuth, checkRol('administrador'), eliminarEstado);
+router.put("/eliminar/estado/:idGrado", checkAuth, checkRol('administrador'), eliminarEstado);
 router.put("/update/:id", checkAuth, checkRol('administrador'), actualizar);
 
 // 3. Rutas DELETE
