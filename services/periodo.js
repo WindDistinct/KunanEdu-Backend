@@ -6,7 +6,7 @@ async function registrarAuditoriaPeriodo({
   anio_anterior, anio_nuevo,
   descripcion_anterior, descripcion_nuevo,
   progreso_anterior, progreso_nuevo,
-  estado_anterior, estado_nuevo,
+  estado_anterior, estado_nuevo,observacion,
   operacion, usuario
 }) {
   const fecha = new Date(); 
@@ -16,9 +16,9 @@ async function registrarAuditoriaPeriodo({
       id_periodo, anio_anterior, anio_nuevo,
       descripcion_anterior, descripcion_nuevo,
       progreso_anterior, progreso_nuevo,
-      estado_anterior, estado_nuevo,
+      estado_anterior, estado_nuevo,observacion,
       operacion, fecha_modificacion, usuario_modificador
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
   `;
 
   const values = [
@@ -26,7 +26,7 @@ async function registrarAuditoriaPeriodo({
     anio_anterior, anio_nuevo,
     descripcion_anterior, descripcion_nuevo,
     progreso_anterior, progreso_nuevo,
-    estado_anterior, estado_nuevo,
+    estado_anterior, estado_nuevo,observacion,
     operacion, fecha, usuario
   ];
 
@@ -70,6 +70,7 @@ async function insertarPeriodo(datos, usuarioModificador) {
       progreso_nuevo: progreso,
       estado_anterior: null,
       estado_nuevo: true,
+       observacion:'Nuevo registro',
       operacion: 'INSERT',
       usuario: usuarioModificador.usuario
     });
@@ -146,7 +147,7 @@ async function obtenerTodosLosPeriodosAuditoria() {
 
 // Actualizar periodo
 async function actualizarPeriodo(id, datos, usuarioModificador) {
-  const { anio, descripcion, progreso, estado } = datos;
+  const { anio, descripcion, progreso, estado,observacion } = datos;
 
   try {
     const resultAnterior = await pool.query(
@@ -193,6 +194,7 @@ async function actualizarPeriodo(id, datos, usuarioModificador) {
       progreso_nuevo: progreso,
       estado_anterior: anterior.estado,
       estado_nuevo: estado,
+        observacion:observacion,
       operacion: 'UPDATE',
       usuario: usuarioModificador.usuario
     });
@@ -233,6 +235,7 @@ async function eliminarPeriodo(id, usuarioModificador) {
       progreso_nuevo: anterior.progreso,
       estado_anterior: anterior.estado,
       estado_nuevo: false,
+        observacion:'Registro eliminado',
       operacion: 'DELETE',
       usuario: usuarioModificador.usuario
     });
