@@ -231,7 +231,7 @@ async function actualizarEmpleado(id, datos, usuarioModificador) {
   let {
     nombre_emp, ape_pat_emp, ape_mat_emp,
     fec_nac, especialidad, tipo_documento, numero_documento,telefono,
-    observacion, cargo, estado
+    obs, cargo, estado
   } = datos;
 
   try {
@@ -276,7 +276,7 @@ async function actualizarEmpleado(id, datos, usuarioModificador) {
       numero_documento_nuevo: numero_documento,
       telefono_anterior: anterior.telefono,
       telefono_nuevo: telefono,
-      observacion: observacion,
+      observacion: obs,
       cargo_anterior: anterior.cargo,
       cargo_nuevo: cargo,
       estado_anterior: anterior.estado,
