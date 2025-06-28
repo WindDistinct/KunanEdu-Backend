@@ -37,7 +37,7 @@ const listarAuditoria = async (req, res) => {
 const actualizar = async (req, res) => {
   try {
     const cambios = await aulaService.actualizarAula(req.params.id, req.body,req.user);
-    if (cambios === 0) return res.status(404).json({ error: "Aula no encontrada" });
+    if (cambios === 0) return res.status(404).json({ error: "Aula no encontrada en el controller" });
     res.json({ mensaje: "Actualizacion",cambios });
   } catch (error) {
     res.status(500).json({ error: error.message });
