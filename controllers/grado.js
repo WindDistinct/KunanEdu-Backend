@@ -44,7 +44,9 @@ const actualizar = async (req, res) => {
 };
 const eliminarEstado = async (req, res) => {
   try {
-    const cambios = await gradoService.eliminarGradoEstado(req.params.id, req.body,req.user);
+     const { idGrado } = req.params;
+    
+    const cambios = await gradoService.eliminarGradoEstado( parseInt(idGrado), req.body,req.user);
     if (cambios === 0) return res.status(404).json({ error: "Grado no encontrado o sin cambios" });
     res.json({ mensaje: "Grado actualizado" });
   } catch (error) {
