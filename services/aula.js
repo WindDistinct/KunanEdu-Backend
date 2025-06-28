@@ -172,7 +172,7 @@ async function actualizarAula(id, datos, usuarioModificador) {
       usuario: usuarioModificador.usuario
     });
 
-    return { mensaje: "Aula actualizada y auditada",datos:datos };
+    return { mensaje: "Aula actualizada y auditada",datos };
   } catch (err) {
     console.error("❌ Error al actualizar aula:", err);
     throw err;

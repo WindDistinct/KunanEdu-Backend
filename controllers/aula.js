@@ -38,7 +38,7 @@ const actualizar = async (req, res) => {
   try {
     const cambios = await aulaService.actualizarAula(req.params.id, req.body,req.user);
     if (cambios === 0) return res.status(404).json({ error: "Aula no encontrada" });
-    res.json({ mensaje: "Aula actualizada correctamente" });
+    res.json({ mensaje: "Aula actualizada correctamente",cambios });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
