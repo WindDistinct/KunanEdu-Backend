@@ -10,7 +10,7 @@ async function registrarAuditoriaAlumno({
   direccion_anterior, direccion_nuevo,
   telefono_anterior, telefono_nuevo,
   fecha_nacimiento_anterior, fecha_nacimiento_nuevo,
-  estado_anterior, estado_nuevo,
+  estado_anterior, estado_nuevo,observacion,
   operacion, usuario
 }) {
   const fecha = new Date(); 
@@ -25,12 +25,12 @@ async function registrarAuditoriaAlumno({
       direccion_anterior, direccion_nuevo,
       telefono_anterior, telefono_nuevo,
       fecha_nacimiento_anterior, fecha_nacimiento_nuevo,
-      estado_anterior, estado_nuevo,
+      estado_anterior, estado_nuevo,observacion,
       operacion, fecha_modificacion, usuario_modificador
     ) VALUES (
       $1, $2, $3, $4, $5, $6, $7,
       $8, $9, $10, $11, $12, $13,
-      $14, $15, $16, $17, $18, $19, $20
+      $14, $15, $16, $17, $18, $19, $20, $21
     )
   `;
 
@@ -43,7 +43,7 @@ async function registrarAuditoriaAlumno({
     direccion_anterior, direccion_nuevo,
     telefono_anterior, telefono_nuevo,
     fecha_nacimiento_anterior, fecha_nacimiento_nuevo,
-    estado_anterior, estado_nuevo,
+    estado_anterior, estado_nuevo, observacion,
     operacion, fecha, usuario
   ];
 
@@ -98,6 +98,7 @@ async function insertarAlumno(datos, usuarioModificador) {
       fecha_nacimiento_nuevo: fecha_nacimiento,
       estado_anterior: null,
       estado_nuevo: true,
+      observacion:'Nuevo registro',
       operacion: 'INSERT',
       usuario: usuarioModificador.usuario
     });
@@ -189,7 +190,7 @@ async function obtenerTodosLosAlumnosAudit() {
 async function actualizarAlumno(id, datos, usuarioModificador) {
   const {
     nombre, apellido_paterno, apellido_materno,
-    tipo_documento,numero_documento, direccion, telefono, fecha_nacimiento, estado
+    tipo_documento,numero_documento, direccion, telefono, fecha_nacimiento, estado,observacion
   } = datos;
 
   try {
@@ -236,6 +237,7 @@ async function actualizarAlumno(id, datos, usuarioModificador) {
       fecha_nacimiento_nuevo: fecha_nacimiento,
       estado_anterior: anterior.estado,
       estado_nuevo: estado,
+       observacion: observacion,
       operacion: 'UPDATE',
       usuario: usuarioModificador.usuario
     });
@@ -284,6 +286,7 @@ async function eliminarAlumno(id, usuarioModificador) {
       fecha_nacimiento_nuevo: anterior.fecha_nacimiento,
       estado_anterior: anterior.estado,
       estado_nuevo: false,
+      observacion:'Registro eliminado',
       operacion: 'DELETE',
       usuario: usuarioModificador.usuario
     });
