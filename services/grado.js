@@ -194,42 +194,7 @@ async function actualizarGrado(id, datos, usuarioModificador) {
   }
 }
 
-async function eliminarGradoEstado(id, datos, usuarioModificador) {
-  const { observacion } = datos;
-
-  try { 
-    const resultAnterior = await pool.query(
-      "SELECT * FROM tb_grado WHERE id_grado = $1",
-      [id]
-    ); 
-    if (resultAnterior.rowCount === 0) {
-      throw new Error("Grado no encontrado");
-    } 
-    const anterior = resultAnterior.rows[0]; 
-    await pool.query(
-      "UPDATE tb_grado SET estado = false WHERE id_grado = $1",
-      [id]
-    );
-    await registrarAuditoriaGrado({
-      id_grado: id,
-      nivel_anterior: anterior.nivel,
-      nivel_nuevo: anterior.nivel,
-      anio_anterior: anterior.anio,
-      anio_nuevo: anterior.anio,
-      estado_anterior: anterior.estado,
-      estado_nuevo: false,
-      observacion:observacion,
-      operacion: 'DELETE',
-      usuario: usuarioModificador.usuario
-    });
-
-    return { mensaje: "Grado actualizado y auditado" };
-  } catch (err) {
-    console.error("❌ Error al actualizar grado:", err);
-    throw err;
-  }
-}
-
+ 
 // Eliminar grado (borrado lógico)
 async function eliminarGrado(id, usuarioModificador) {
   try {
@@ -275,5 +240,5 @@ module.exports = {
   obtenerTodosLosGrados,
   actualizarGrado,
   obtenerTodosLosGradosAuditoria,
-  eliminarGrado,eliminarGradoEstado
+  eliminarGrado
 };
