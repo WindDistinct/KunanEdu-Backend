@@ -166,12 +166,12 @@ async function actualizarGrado(id, datos, usuarioModificador) {
  
     const sqlUpdate = `
       UPDATE tb_grado
-      SET nivel = $1, anio = $2, estado = $3, observacion = $4
-      WHERE id_grado = $5
+      SET nivel = $1, anio = $2, estado = $3
+      WHERE id_grado = $4
     `;
 
     await pool.query(sqlUpdate, [
-      nivel, anio, estado,observacion, id
+      nivel, anio, estado, id
     ]);
  
     await registrarAuditoriaGrado({
