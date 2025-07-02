@@ -144,7 +144,7 @@ async function actualizarAsistencia(id, datos, usuarioModificador) {
     `;
 
     await pool.query(sqlUpdate, [
-      alumno, fecha, dia, asistio, estado, id
+       asistio, estado, id
     ]);
 
     await registrarAuditoriaAsistencia({
