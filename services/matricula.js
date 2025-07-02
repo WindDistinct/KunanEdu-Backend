@@ -249,9 +249,7 @@ async function actualizarMatricula(id, datos, usuarioModificador) {
     ]);
 
     await registrarAuditoriaMatricula({
-      id_matricula: id, 
-      observacion_anterior: anterior.observacion,
-      observacion_nuevo: observacion,
+      id_matricula: id,  
       alumno_anterior: anterior.alumno,
       alumno_nuevo: alumno,
       seccion_anterior: anterior.seccion,
@@ -292,9 +290,7 @@ async function eliminarMatricula(id, usuarioModificador) {
     );
 
     await registrarAuditoriaMatricula({
-      id_matricula: id, 
-      observacion_anterior: anterior.observacion,
-      observacion_nuevo: anterior.observacion,
+      id_matricula: id,  
       alumno_anterior: anterior.alumno,
       alumno_nuevo: anterior.alumno,
       seccion_anterior: anterior.seccion,
