@@ -9,7 +9,7 @@ async function registrarAuditoriaUsuario({
   estado_anterior, estado_nuevo,
   password_anterior, password_nuevo,
   rol_anterior, rol_nuevo,
-  empleado_anterior,empleado_nuevo,
+  empleado_anterior,empleado_nuevo,observacion,
   operacion,
   usuario_modificador
 }) {
@@ -22,12 +22,12 @@ async function registrarAuditoriaUsuario({
       estado_anterior, estado_nuevo,
       password_anterior, password_nuevo,
       rol_anterior, rol_nuevo,
-      empleado_anterior,empleado_nuevo,
+      empleado_anterior,empleado_nuevo,observacion,
       operacion,
       fecha_modificacion,
       usuario_modificador
     )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12,$13,$14)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12,$13,$14,$15)
   `;
 
   const values = [
@@ -36,7 +36,7 @@ async function registrarAuditoriaUsuario({
     estado_anterior, estado_nuevo,
     password_anterior, password_nuevo,
     rol_anterior, rol_nuevo,
-    empleado_anterior,empleado_nuevo,
+    empleado_anterior,empleado_nuevo,observacion,
     operacion,
     fecha,
     usuario_modificador
@@ -124,6 +124,7 @@ async function insertarUsuario(datos, usuarioModificador) {
       rol_nuevo: rol,
       empleado_anterior:null,
       empleado_nuevo:empleado,
+      observacion:'Nuevo registro',
       operacion: 'INSERT',
       usuario_modificador: usuarioModificador.usuario
     });
@@ -159,7 +160,7 @@ async function loginUsuario({ username, password }) {
 
 // Actualizar usuario
 async function actualizarUsuario(id, datos, usuarioModificador) {
-  const { username, password, rol, estado,empleado } = datos;
+  const { username, password, rol, estado,empleado,observacion } = datos;
 
   try {
     const resultAnterior = await pool.query(
@@ -215,6 +216,7 @@ async function actualizarUsuario(id, datos, usuarioModificador) {
       rol_nuevo: rol,
       empleado_anterior:anterior.empleado,
       empleado_nuevo:empleado,
+      observacion:observacion,
       operacion: "UPDATE",
       usuario_modificador: usuarioModificador.usuario,
     });
@@ -257,6 +259,7 @@ async function eliminarUsuario(id, usuarioModificador) {
       rol_nuevo: anterior.rol,
       empleado_anterior:anterior.empleado,
       empleado_nuevo:anterior.empleado,
+      observacion:'Registro eliminado',
       operacion: 'DELETE',
       usuario_modificador: usuarioModificador.usuario
     });

@@ -4,7 +4,7 @@ async function registrarAuditoriaCursoGrado({
   id_curso_grado,
   curso_anterior, curso_nuevo,
   grado_anterior, grado_nuevo,
-  estado_anterior, estado_nuevo,
+  estado_anterior, estado_nuevo,observacion,
   operacion, usuario
 }) {
   const fecha = new Date();
@@ -13,16 +13,16 @@ async function registrarAuditoriaCursoGrado({
     INSERT INTO tb_audit_curso_grado (
       id_curso_grado, curso_anterior, curso_nuevo,
       grado_anterior, grado_nuevo,
-      estado_anterior, estado_nuevo,
+      estado_anterior, estado_nuevo,observacion,
       operacion, fecha_modificacion, usuario_modificador
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10,$11)
   `;
 
   const values = [
     id_curso_grado,
     curso_anterior, curso_nuevo,
     grado_anterior, grado_nuevo,
-    estado_anterior, estado_nuevo,
+    estado_anterior, estado_nuevo,observacion,
     operacion, fecha, usuario
   ];
 
@@ -68,6 +68,7 @@ async function insertarCursoGrado(datos, usuarioModificador) {
       grado_nuevo: grado,
       estado_anterior: null,
       estado_nuevo: true,
+      observacion:'Nuevo registro',
       operacion: 'INSERT',
       usuario: usuarioModificador.usuario
     });
@@ -166,7 +167,7 @@ async function obtenerTodasLasCursoGradoAudit() {
 }
  
 async function actualizarCursoGrado(id, datos, usuarioModificador) {
-   const { curso, grado, estado } = datos;
+   const { curso, grado, estado,observacion } = datos;
 
   try {
     const resultAnterior = await pool.query(
@@ -203,6 +204,7 @@ async function actualizarCursoGrado(id, datos, usuarioModificador) {
       grado_nuevo: grado,
       estado_anterior: anterior.estado,
       estado_nuevo: estado,
+      observacion:observacion,
       operacion: 'UPDATE',
       usuario: usuarioModificador.usuario
     });
@@ -240,6 +242,7 @@ async function eliminarCursoGrado(id, usuarioModificador) {
       grado_nuevo: anterior.grado,
       estado_anterior: anterior.estado,
       estado_nuevo: false,
+       observacion:'Registro eliminado',
       operacion: 'DELETE',
       usuario: usuarioModificador.usuario
     });

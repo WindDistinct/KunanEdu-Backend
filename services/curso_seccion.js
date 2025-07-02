@@ -5,7 +5,7 @@ async function registrarAuditoriaCursoSeccion({
   curso_anterior, curso_nuevo,
   seccion_anterior, seccion_nuevo,
    docente_anterior, docente_nuevo,
-  estado_anterior, estado_nuevo,
+  estado_anterior, estado_nuevo,observacion,
   operacion, usuario
 }) {
   const fecha = new Date();
@@ -15,9 +15,9 @@ async function registrarAuditoriaCursoSeccion({
       id_curso_seccion, curso_anterior, curso_nuevo,
      seccion_anterior, seccion_nuevo,
       docente_anterior, docente_nuevo,
-      estado_anterior, estado_nuevo,
+      estado_anterior, estado_nuevo,observacion,
       operacion, fecha_modificacion, usuario_modificador
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12,$13)
   `;
 
   const values = [
@@ -25,7 +25,7 @@ async function registrarAuditoriaCursoSeccion({
     curso_anterior, curso_nuevo,
     seccion_anterior, seccion_nuevo,
    docente_anterior, docente_nuevo,
-    estado_anterior, estado_nuevo,
+    estado_anterior, estado_nuevo,observacion,
     operacion, fecha, usuario
   ];
 
@@ -65,6 +65,7 @@ async function insertarCursoSeccion(datos, usuarioModificador) {
       docente_nuevo: docente,
       estado_anterior: null,
       estado_nuevo: true,
+      observacion:'Nuevo registro',
       operacion: 'INSERT',
       usuario: usuarioModificador.usuario
     });
@@ -100,6 +101,7 @@ async function insertarMultiplesCursoSeccion(listaDatos, usuarioModificador) {
       docente_nuevo: docente,
       estado_anterior: null,
       estado_nuevo: true,
+       observacion:'Nuevo registro',
       operacion: 'INSERT',
       usuario: usuarioModificador.usuario
     });
@@ -199,7 +201,7 @@ async function obtenerTodasLosCursoSeccionAudit() {
 }
  
 async function actualizarCursoSeccion(id, datos, usuarioModificador) {
-   const { curso, seccion,docente, estado } = datos;
+   const { curso, seccion,docente, estado,observacion } = datos;
 
   try {
     const resultAnterior = await pool.query(
@@ -228,6 +230,7 @@ async function actualizarCursoSeccion(id, datos, usuarioModificador) {
       docente_nuevo: docente,
       estado_anterior: null,
       estado_nuevo: true,
+      observacion:observacion,
       operacion: 'UPDATE',
       usuario: usuarioModificador.usuario
     });
@@ -267,6 +270,7 @@ async function eliminarCursoSeccion(id, usuarioModificador) {
       docente_nuevo: anterior.docente,
       estado_anterior: anterior.estado,
       estado_nuevo: false,
+       observacion:'Registro eliminado',
       operacion: 'DELETE',
       usuario: usuarioModificador.usuario
     });
