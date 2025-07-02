@@ -48,18 +48,18 @@ async function registrarAuditoriaAsistencia({
 
 // Insertar asistencia
 async function insertarAsistencia(datos, usuarioModificador) {
-  const { alumno, fecha, dia, asistio } = datos;
+  const { alumno, fecha, dia, asistio,cursoSeccion } = datos;
 
   const sqlInsert = `
     INSERT INTO tb_asistencia (
-      alumno, fecha, dia, asistio, estado
-    ) VALUES ($1, $2, $3, $4, true)
+      alumno, fecha, dia, asistio,cursoSeccion, estado
+    ) VALUES ($1, $2, $3, $4, $5, true)
     RETURNING id_asistencia
   `;
 
   try {
     const result = await pool.query(sqlInsert, [
-      alumno, fecha, dia, asistio
+      alumno, fecha, dia, asistio,cursoSeccion
     ]);
     const id_asistencia = result.rows[0].id_asistencia;
 
@@ -122,7 +122,7 @@ async function obtenerTodasLasAsistenciasAuditoria() {
 }
 // Actualizar asistencia
 async function actualizarAsistencia(id, datos, usuarioModificador) {
-  const { alumno, fecha, dia, asistio, estado } = datos;
+  const { asistio, estado } = datos;
 
   try {
     const resultAnterior = await pool.query(
@@ -138,9 +138,9 @@ async function actualizarAsistencia(id, datos, usuarioModificador) {
 
     const sqlUpdate = `
       UPDATE tb_asistencia
-      SET alumno = $1, fecha = $2, dia = $3,
-          asistio = $4, estado = $5
-      WHERE id_asistencia = $6
+      SET 
+          asistio = $1, estado = $2
+      WHERE id_asistencia = $3
     `;
 
     await pool.query(sqlUpdate, [
@@ -150,11 +150,11 @@ async function actualizarAsistencia(id, datos, usuarioModificador) {
     await registrarAuditoriaAsistencia({
       id_asistencia: id,
       alumno_anterior: anterior.alumno,
-      alumno_nuevo: alumno,
+      alumno_nuevo: anterior.alumno,
       fecha_anterior: anterior.fecha,
-      fecha_nuevo: fecha,
+      fecha_nuevo: anterior.fecha,
       dia_anterior: anterior.dia,
-      dia_nuevo: dia,
+      dia_nuevo: anterior.dia,
       asistio_anterior: anterior.asistio,
       asistio_nuevo: asistio,
       estado_anterior: anterior.estado,
