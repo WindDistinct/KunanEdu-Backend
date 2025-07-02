@@ -7,7 +7,7 @@ async function registrarAuditoriaSeccion({
   grado_anterior, grado_nuevo,
   nombre_anterior, nombre_nuevo,
   periodo_anterior, periodo_nuevo,
-  estado_anterior, estado_nuevo,
+  estado_anterior, estado_nuevo,observacion,
   operacion, usuario
 }) {
  const fecha = new Date(); 
@@ -18,11 +18,11 @@ async function registrarAuditoriaSeccion({
       grado_anterior, grado_nuevo,
       nombre_anterior, nombre_nuevo,
       periodo_anterior, periodo_nuevo,
-      estado_anterior, estado_nuevo,
+      estado_anterior, estado_nuevo,observacion,
       operacion, fecha_modificacion, usuario_modificador
     ) VALUES (
       $1, $2, $3, $4, $5, $6, $7,
-      $8, $9, $10, $11, $12, $13, $14
+      $8, $9, $10, $11, $12, $13, $14, $15
     )
   `;
 
@@ -32,7 +32,7 @@ async function registrarAuditoriaSeccion({
     grado_anterior, grado_nuevo,
     nombre_anterior, nombre_nuevo,
     periodo_anterior, periodo_nuevo,
-    estado_anterior, estado_nuevo,
+    estado_anterior, estado_nuevo,observacion,
     operacion, fecha, usuario
   ];
 
@@ -83,6 +83,7 @@ async function insertarSeccion(datos, usuarioModificador) {
       periodo_nuevo: periodo,
       estado_anterior: null,
       estado_nuevo: true,
+      observacion:'Nuevo registro',
       operacion: 'INSERT',
       usuario: usuarioModificador.usuario
     });
@@ -177,7 +178,7 @@ async function obtenerTodasLasSeccionesAuditoria() {
 }
 // Actualizar sección
 async function actualizarSeccion(id, datos, usuarioModificador) {
-  const { aula, grado, nombre, periodo, estado } = datos;
+  const { aula, grado, nombre, periodo, estado,observacion } = datos;
  
   try {
     const resultAnterior = await pool.query(
@@ -224,6 +225,7 @@ async function actualizarSeccion(id, datos, usuarioModificador) {
       periodo_nuevo: periodo,
       estado_anterior: anterior.estado,
       estado_nuevo: estado,
+      observacion:observacion,
       operacion: 'UPDATE',
       usuario: usuarioModificador.usuario
     });
@@ -266,6 +268,7 @@ async function eliminarSeccion(id, usuarioModificador) {
       periodo_nuevo: anterior.periodo,
       estado_anterior: anterior.estado,
       estado_nuevo: false,
+       observacion:'Registro eliminado',
       operacion: 'DELETE',
       usuario: usuarioModificador.usuario
     });
