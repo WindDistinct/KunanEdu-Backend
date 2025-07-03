@@ -10,7 +10,7 @@ async function registrarAuditoriaAsistencia({
   estado_anterior, estado_nuevo,
   operacion, usuario
 }) {
-  const fecha = new Date(); 
+  const fechaA = new Date(); 
 
   const sqlAudit = `
     INSERT INTO tb_audit_asistencia (
@@ -34,7 +34,7 @@ async function registrarAuditoriaAsistencia({
     dia,
     asistio_anterior, asistio_nuevo,
     estado_anterior, estado_nuevo,
-    operacion, fecha, usuario
+    operacion, fechaA, usuario
   ];
 
   try {
