@@ -84,54 +84,39 @@ async function insertarAsistencia(datos, usuarioModificador) {
 }
 
 async function insertarMultiplesAsistencias(listaDatos, usuarioModificador) {
-  const resultados = [];
-  const sqlInsert = `
-      INSERT INTO tb_asistencia (
-        id_matricula, fecha, dia, asistio, id_curso_seccion, estado
-      ) VALUES ($1, $2, $3, $4, $5, true)
-      RETURNING id_asistencia
-    `;
-  for (const datos of listaDatos) {
-    const { id_matricula, fecha, dia, asistio, id_curso_seccion } = datos;
+    for (const datos of listaDatos) {
+    const { id_matricula, fecha, asistio, dia, id_curso_seccion } = datos;
 
-      const result = await pool.query(sqlInsert, [
-        id_matricula,
-        fecha,
-        dia,
-        asistio,
-        id_curso_seccion,
-      ]);
+    // Buscar si ya existe
+    const resultado = await pool.query(
+      `SELECT id_asistencia FROM tb_asistencia 
+       WHERE id_matricula = $1 AND fecha = $2 AND id_curso_seccion = $3`,
+      [id_matricula, fecha, id_curso_seccion]
+    );
 
-      const id_asistencia = result.rows[0].id_asistencia;
-
-      /*
- await registrarAuditoriaAsistencia({
-        id_asistencia,
-        id_matricula: id_matricula, 
-        fecha: fecha,  
-        dia: dia,
-        asistio_anterior: null,
-        asistio_nuevo: asistio,
-        estado_anterior: null,
-        estado_nuevo: true,
-        operacion: 'INSERT',
-        usuario: usuarioModificador.usuario,
-      });
-      */
-     
-
-      resultados.push({ id: id_asistencia, mensaje: "Insertado con éxito" });
+    if (resultado.rowCount > 0) {
+      // Ya existe, entonces actualiza
+      await pool.query(
+        `UPDATE tb_asistencia SET asistio = $1 
+         WHERE id_matricula = $2 AND fecha = $3 AND id_curso_seccion = $4`,
+        [asistio, id_matricula, fecha, id_curso_seccion]
+      );
+    } else {
+      // No existe, entonces inserta
+      await pool.query(
+        `INSERT INTO tb_asistencia (id_matricula, fecha, dia, asistio, id_curso_seccion, estado) 
+         VALUES ($1, $2, $3, $4, $5, true)`,
+        [id_matricula, fecha, dia, asistio, id_curso_seccion]
+      );
+    }
   }
-
-  return resultados;
+ 
 }
 async function obtenerPorFechaYCurso(cursoSeccion, fecha) {
   const sql = `
-    SELECT a.id_matricula, a.asistio
-    FROM tb_asistencia a
-    JOIN tb_matricula m ON a.id_matricula = m.id_matricula
-	JOIN tb_curso_seccion cs ON m.seccion=cs.seccion
-    WHERE cs.id_curso_seccion = $1 AND a.fecha = $2 AND a.estado = true
+     SELECT a.id_matricula, a.asistio
+    FROM tb_asistencia a 
+    WHERE a.id_curso_seccion = $1 AND a.fecha = $2 AND a.estado = true
   `;
 
   try {
