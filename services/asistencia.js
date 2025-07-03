@@ -3,9 +3,9 @@ const pool = require("../database/db.js");
 // Auditoría de asistencia
 async function registrarAuditoriaAsistencia({
   id_asistencia,
-  alumno_anterior, alumno_nuevo,
-  fecha_anterior, fecha_nuevo,
-  dia_anterior, dia_nuevo,
+  id_matricula,
+  fecha,
+  dia,
   asistio_anterior, asistio_nuevo,
   estado_anterior, estado_nuevo,
   operacion, usuario
@@ -15,23 +15,23 @@ async function registrarAuditoriaAsistencia({
   const sqlAudit = `
     INSERT INTO tb_audit_asistencia (
       id_asistencia,
-      alumno_anterior, alumno_nuevo,
-      fecha_anterior, fecha_nuevo,
-      dia_anterior, dia_nuevo,
+      id_matricula,
+      fecha,
+      dia,
       asistio_anterior, asistio_nuevo,
       estado_anterior, estado_nuevo,
       operacion, fecha_modificacion, usuario_modificador
     ) VALUES (
       $1, $2, $3, $4, $5, $6, $7,
-      $8, $9, $10, $11, $12, $13, $14
+      $8, $9, $10, $11
     )
   `;
 
   const values = [
     id_asistencia,
-    alumno_anterior, alumno_nuevo,
-    fecha_anterior, fecha_nuevo,
-    dia_anterior, dia_nuevo,
+    id_matricula,
+    fecha,
+    dia,
     asistio_anterior, asistio_nuevo,
     estado_anterior, estado_nuevo,
     operacion, fecha, usuario
@@ -65,12 +65,9 @@ async function insertarAsistencia(datos, usuarioModificador) {
 
     await registrarAuditoriaAsistencia({
       id_asistencia,
-      alumno_anterior: null,
-      alumno_nuevo: alumno,
-      fecha_anterior: null,
-      fecha_nuevo: fecha,
-      dia_anterior: null,
-      dia_nuevo: dia,
+      id_matricula: alumno, 
+      fecha: fecha,  
+      dia: dia,
       asistio_anterior: null,
       asistio_nuevo: asistio,
       estado_anterior: null,
@@ -110,12 +107,9 @@ async function insertarMultiplesAsistencias(listaDatos, usuarioModificador) {
 
       await registrarAuditoriaAsistencia({
         id_asistencia,
-        alumno_anterior: null,
-        alumno_nuevo: id_matricula,
-        fecha_anterior: null,
-        fecha_nuevo: fecha,
-        dia_anterior: null,
-        dia_nuevo: dia,
+        id_matricula: id_matricula, 
+        fecha: fecha,  
+        dia: dia,
         asistio_anterior: null,
         asistio_nuevo: asistio,
         estado_anterior: null,
