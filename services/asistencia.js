@@ -105,18 +105,7 @@ async function insertarMultiplesAsistencias(listaDatos, usuarioModificador) {
 
       const id_asistencia = result.rows[0].id_asistencia;
 
-      await registrarAuditoriaAsistencia({
-        id_asistencia,
-        id_matricula: id_matricula, 
-        fecha: fecha,  
-        dia: dia,
-        asistio_anterior: null,
-        asistio_nuevo: asistio,
-        estado_anterior: null,
-        estado_nuevo: true,
-        operacion: 'INSERT',
-        usuario: usuarioModificador.usuario,
-      });
+     
 
       resultados.push({ id: id_asistencia, mensaje: "Insertado con éxito" });
     } catch (err) {
