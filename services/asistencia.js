@@ -125,7 +125,22 @@ async function insertarMultiplesAsistencias(listaDatos, usuarioModificador) {
 
   return resultados;
 }
+async function obtenerPorFechaYCurso(cursoSeccion, fecha) {
+  const sql = `
+    SELECT a.id_matricula, a.asistio
+    FROM tb_asistencia a
+    JOIN tb_matricula m ON a.id_matricula = m.id_matricula
+    WHERE m.curso_seccion = $1 AND a.fecha = $2 AND a.estado = true
+  `;
 
+  try {
+    const result = await pool.query(sql, [cursoSeccion, fecha]);
+    return result.rows; // [{ id_matricula: ..., asistio: ... }, ...]
+  } catch (err) {
+    console.error("❌ Error en asistenciaService.obtenerPorFechaYCurso:", err);
+    throw err;
+  }
+}
 // Obtener asistencias activas
 async function obtenerAsistencias() {
   const sql = "SELECT * FROM tb_asistencia WHERE estado = true";
@@ -257,6 +272,6 @@ module.exports = {
   obtenerAsistencias,
   obtenerTodasLasAsistencias,
   actualizarAsistencia,
-  obtenerTodasLasAsistenciasAuditoria,
+  obtenerTodasLasAsistenciasAuditoria,obtenerPorFechaYCurso,
   eliminarAsistencia,insertarMultiplesAsistencias
 };
