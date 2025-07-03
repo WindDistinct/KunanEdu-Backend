@@ -6,7 +6,7 @@ const checkRol = require("../middleware/rol");
 
 
 router.get("/all", listar);
-router.get("/all-adm1", listarTodo);
+router.get("/all-adm2", listarTodo);
 router.get("/all-audit", listarAuditoria);
 router.get('/por-fecha', checkAuth, checkRol('profesor'), obtenerPorFechaYCurso);
 router.post('/multiple',checkAuth,checkRol('profesor'),crearMultiples);
