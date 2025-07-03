@@ -17,6 +17,14 @@ const listado = async (_req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const listarNotas = async (_req, res) => {
+  try {
+    const examen = await examenService.obtenerTodasLasNotas();
+    res.json(examen);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 const listarTodo = async (_req, res) => {
   try {
     const examen = await examenService.obtenerTodosLosExamenes();
@@ -95,6 +103,7 @@ module.exports = {
   listado,
   listarAuditoria,
   actualizar, 
+  listarNotas,
   listarNotasAlumno,
   eliminar,listarTodo,crearMultiples,listarNotasBimestre
 };

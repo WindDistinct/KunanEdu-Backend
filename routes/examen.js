@@ -14,5 +14,4 @@ router.get("/notas-curso/:docente/:periodo/:cursoseccion", listarNotasCurso);
 router.delete("/delete/:id",checkAuth,checkRol('profesor'),eliminar)
 router.put("/update/:id",checkAuth,checkRol('profesor'),actualizar)
 router.post("/create", checkAuth,checkRol('profesor'),insertar);
-
 module.exports = router;
