@@ -33,6 +33,14 @@ const listarAuditoria = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const crearMultiples = async (req, res) => {
+  try {
+    const resultado = await asistenciaService.insertarMultiplesAsistencias(req.body, req.user);
+    res.json({ mensaje: "Asistencias creadas correctamente", resultado });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 const actualizar = async (req, res) => {
   try {
@@ -60,5 +68,5 @@ module.exports = {
   actualizar,
   eliminar,
   listarAuditoria,
-  listarTodo
+  listarTodo,crearMultiples
 };

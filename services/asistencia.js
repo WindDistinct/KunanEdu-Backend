@@ -86,6 +86,54 @@ async function insertarAsistencia(datos, usuarioModificador) {
   }
 }
 
+async function insertarMultiplesAsistencias(listaDatos, usuarioModificador) {
+  const resultados = [];
+  const sqlInsert = `
+      INSERT INTO tb_asistencia (
+        id_matricula, fecha, dia, asistio, id_curso_seccion, estado
+      ) VALUES ($1, $2, $3, $4, $5, true)
+      RETURNING id_asistencia
+    `;
+  for (const datos of listaDatos) {
+    const { id_matricula, fecha, dia, asistio, id_curso_seccion } = datos;
+
+    try {
+      const result = await pool.query(sqlInsert, [
+        id_matricula,
+        fecha,
+        dia,
+        asistio,
+        id_curso_seccion,
+      ]);
+
+      const id_asistencia = result.rows[0].id_asistencia;
+
+      await registrarAuditoriaAsistencia({
+        id_asistencia,
+        alumno_anterior: null,
+        alumno_nuevo: id_matricula,
+        fecha_anterior: null,
+        fecha_nuevo: fecha,
+        dia_anterior: null,
+        dia_nuevo: dia,
+        asistio_anterior: null,
+        asistio_nuevo: asistio,
+        estado_anterior: null,
+        estado_nuevo: true,
+        operacion: 'INSERT',
+        usuario: usuarioModificador.usuario,
+      });
+
+      resultados.push({ id: id_asistencia, mensaje: "Insertado con éxito" });
+    } catch (err) {
+      console.error("❌ Error en asistencia múltiple:", err);
+      resultados.push({ error: true, mensaje: "Error al insertar", detalle: err.message });
+    }
+  }
+
+  return resultados;
+}
+
 // Obtener asistencias activas
 async function obtenerAsistencias() {
   const sql = "SELECT * FROM tb_asistencia WHERE estado = true";
@@ -218,5 +266,5 @@ module.exports = {
   obtenerTodasLasAsistencias,
   actualizarAsistencia,
   obtenerTodasLasAsistenciasAuditoria,
-  eliminarAsistencia
+  eliminarAsistencia,insertarMultiplesAsistencias
 };
