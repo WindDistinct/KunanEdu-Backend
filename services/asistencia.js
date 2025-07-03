@@ -130,7 +130,8 @@ async function obtenerPorFechaYCurso(cursoSeccion, fecha) {
     SELECT a.id_matricula, a.asistio
     FROM tb_asistencia a
     JOIN tb_matricula m ON a.id_matricula = m.id_matricula
-    WHERE m.curso_seccion = $1 AND a.fecha = $2 AND a.estado = true
+	JOIN tb_curso_seccion cs ON m.seccion=cs.seccion
+    WHERE cs.id_curso_seccion = $1 AND a.fecha = $2 AND a.estado = true
   `;
 
   try {
