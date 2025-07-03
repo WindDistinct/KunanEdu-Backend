@@ -7,7 +7,7 @@ async function registrarAuditoriaAsistencia({
   fecha,
   dia,
   asistio_anterior, asistio_nuevo,
-  estado_anterior, estado_nuevo,
+  estado_anterior, estado_nuevo,id_curso_seccion,
   operacion, usuario
 }) {
   const fechaA = new Date(); 
@@ -19,11 +19,11 @@ async function registrarAuditoriaAsistencia({
       fecha,
       dia,
       asistio_anterior, asistio_nuevo,
-      estado_anterior, estado_nuevo,
+      estado_anterior, estado_nuevo,id_curso_seccion,
       operacion, fecha_modificacion, usuario_modificador
     ) VALUES (
       $1, $2, $3, $4, $5, $6, $7,
-      $8, $9, $10, $11
+      $8, $9, $10, $11, $12
     )
   `;
 
@@ -33,7 +33,7 @@ async function registrarAuditoriaAsistencia({
     fecha,
     dia,
     asistio_anterior, asistio_nuevo,
-    estado_anterior, estado_nuevo,
+    estado_anterior, estado_nuevo,id_curso_seccion,
     operacion, fechaA, usuario
   ];
 
@@ -72,6 +72,7 @@ async function insertarAsistencia(datos, usuarioModificador) {
       asistio_nuevo: asistio,
       estado_anterior: null,
       estado_nuevo: true,
+      id_curso_seccion:cursoSeccion,
       operacion: 'INSERT',
       usuario: usuarioModificador.usuario
     });
@@ -84,34 +85,69 @@ async function insertarAsistencia(datos, usuarioModificador) {
 }
 
 async function insertarMultiplesAsistencias(listaDatos, usuarioModificador) {
-    for (const datos of listaDatos) {
+  const fechaModificacion = new Date();
+
+  for (const datos of listaDatos) {
     const { id_matricula, fecha, asistio, dia, id_curso_seccion } = datos;
 
-    // Buscar si ya existe
     const resultado = await pool.query(
-      `SELECT id_asistencia FROM tb_asistencia 
+      `SELECT * FROM tb_asistencia 
        WHERE id_matricula = $1 AND fecha = $2 AND id_curso_seccion = $3`,
       [id_matricula, fecha, id_curso_seccion]
     );
 
     if (resultado.rowCount > 0) {
-      // Ya existe, entonces actualiza
+      // Existe → actualizar
+      const asistenciaExistente = resultado.rows[0];
+
       await pool.query(
-        `UPDATE tb_asistencia SET asistio = $1 
+        `UPDATE tb_asistencia 
+         SET asistio = $1 
          WHERE id_matricula = $2 AND fecha = $3 AND id_curso_seccion = $4`,
         [asistio, id_matricula, fecha, id_curso_seccion]
       );
+
+      await registrarAuditoriaAsistencia({
+        id_asistencia: asistenciaExistente.id_asistencia,
+        id_matricula,
+        fecha,
+        dia,
+        asistio_anterior: asistenciaExistente.asistio,
+        asistio_nuevo: asistio,
+        estado_anterior: asistenciaExistente.estado,
+        estado_nuevo: asistenciaExistente.estado, // No cambia en este caso
+        id_curso_seccion,
+        operacion: "UPDATE",
+        usuario: usuarioModificador
+      });
     } else {
-      // No existe, entonces inserta
-      await pool.query(
-        `INSERT INTO tb_asistencia (id_matricula, fecha, dia, asistio, id_curso_seccion, estado) 
-         VALUES ($1, $2, $3, $4, $5, true)`,
+      // No existe → insertar
+      const insert = await pool.query(
+        `INSERT INTO tb_asistencia (id_matricula, fecha, dia, asistio, id_curso_seccion, estado)
+         VALUES ($1, $2, $3, $4, $5, true)
+         RETURNING id_asistencia`,
         [id_matricula, fecha, dia, asistio, id_curso_seccion]
       );
+
+      const idAsistencia = insert.rows[0].id_asistencia;
+
+      await registrarAuditoriaAsistencia({
+        id_asistencia: idAsistencia,
+        id_matricula,
+        fecha,
+        dia,
+        asistio_anterior: null,
+        asistio_nuevo: asistio,
+        estado_anterior: null,
+        estado_nuevo: true,
+        id_curso_seccion,
+        operacion: "INSERT",
+        usuario: usuarioModificador
+      });
     }
   }
- 
 }
+
 async function obtenerPorFechaYCurso(cursoSeccion, fecha) {
   const sql = `
      SELECT a.id_matricula, a.asistio
@@ -188,18 +224,16 @@ async function actualizarAsistencia(id, datos, usuarioModificador) {
        asistio, estado, id
     ]);
 
-    await registrarAuditoriaAsistencia({
-      id_asistencia: id,
-      alumno_anterior: anterior.alumno,
-      alumno_nuevo: anterior.alumno,
-      fecha_anterior: anterior.fecha,
-      fecha_nuevo: anterior.fecha,
-      dia_anterior: anterior.dia,
-      dia_nuevo: anterior.dia,
+    await registrarAuditoriaAsistencia({ 
+      id_asistencia:id,
+      id_matricula: anterior.id_matricula, 
+      fecha: anterior.fecha,  
+      dia: anterior.dia,
       asistio_anterior: anterior.asistio,
       asistio_nuevo: asistio,
       estado_anterior: anterior.estado,
       estado_nuevo: estado,
+      id_curso_seccion:anterior.id_curso_seccion,
       operacion: 'UPDATE',
       usuario: usuarioModificador.usuario
     });
@@ -231,17 +265,15 @@ async function eliminarAsistencia(id, usuarioModificador) {
     );
 
     await registrarAuditoriaAsistencia({
-      id_asistencia: id,
-      alumno_anterior: anterior.alumno,
-      alumno_nuevo: anterior.alumno,
-      fecha_anterior: anterior.fecha,
-      fecha_nuevo: anterior.fecha,
-      dia_anterior: anterior.dia,
-      dia_nuevo: anterior.dia,
+      id_asistencia:id,
+      id_matricula: anterior.id_matricula, 
+      fecha: anterior.fecha,  
+      dia: anterior.dia,
       asistio_anterior: anterior.asistio,
       asistio_nuevo: anterior.asistio,
       estado_anterior: anterior.estado,
       estado_nuevo: false,
+       id_curso_seccion:anterior.id_curso_seccion,
       operacion: 'DELETE',
       usuario: usuarioModificador.usuario
     });
