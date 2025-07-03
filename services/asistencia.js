@@ -118,7 +118,7 @@ async function insertarMultiplesAsistencias(listaDatos, usuarioModificador) {
         estado_nuevo: asistenciaExistente.estado, // No cambia en este caso
         id_curso_seccion,
         operacion: "UPDATE",
-        usuario: usuarioModificador
+        usuario: usuarioModificador.usuario
       });
     } else {
       // No existe → insertar
@@ -142,7 +142,7 @@ async function insertarMultiplesAsistencias(listaDatos, usuarioModificador) {
         estado_nuevo: true,
         id_curso_seccion,
         operacion: "INSERT",
-        usuario: usuarioModificador
+        usuario: usuarioModificador.usuario
       });
     }
   }
