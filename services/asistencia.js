@@ -151,26 +151,26 @@ async function insertarMultiplesAsistencias(listaDatos, usuarioModificador) {
 async function obtenerReportePorCursoPeriodoMes(cursoSeccion, periodo, mes) {
   const sql = `
     SELECT 
-      a.id_asistencia,
-      a.fecha,
-      a.dia,
-      a.asistio,
-       al.nombre || ' ' || al.apellido_paterno || ' ' || al.apellido_materno AS alumno,
-      cs.id_curso_seccion,
-      c.nombre_curso,
-      p.anio || ' ' || p.descripcion AS periodo
-    FROM tb_asistencia a
-    JOIN tb_matricula m ON a.id_matricula = m.id_matricula
-    JOIN tb_alumno al ON m.alumno = al.id_alumno
-    JOIN tb_seccion s ON m.seccion = s.id_seccion
-    JOIN tb_periodo_escolar p ON s.periodo = p.id_periodo
-    JOIN tb_curso_seccion cs ON s.id_seccion = cs.seccion
-    JOIN tb_curso c ON cs.curso = c.id_curso
-    WHERE cs.id_curso_seccion = $1
-      AND p.id_periodo = $2
-      AND EXTRACT(MONTH FROM a.fecha) = $3
-      AND a.estado = true
-    ORDER BY a.fecha, alumno
+  a.id_asistencia,
+  a.fecha,
+  a.dia,
+  a.asistio,
+  al.nombre || ' ' || al.apellido_paterno || ' ' || al.apellido_materno AS alumno,
+  cs.id_curso_seccion,
+  c.nombre_curso,
+  p.anio || ' ' || p.descripcion AS periodo
+FROM tb_asistencia a
+JOIN tb_matricula m ON a.id_matricula = m.id_matricula
+JOIN tb_alumno al ON m.alumno = al.id_alumno
+JOIN tb_seccion s ON m.seccion = s.id_seccion
+JOIN tb_periodo_escolar p ON s.periodo = p.id_periodo
+JOIN tb_curso_seccion cs ON a.id_curso_seccion = cs.id_curso_seccion   
+JOIN tb_curso c ON cs.curso = c.id_curso
+WHERE cs.id_curso_seccion = $1
+  AND p.id_periodo = $2
+  AND EXTRACT(MONTH FROM a.fecha) = $3
+  AND a.estado = true
+ORDER BY a.fecha, alumno;
   `;
   const result = await pool.query(sql, [cursoSeccion, periodo, mes]);
   return result.rows;
