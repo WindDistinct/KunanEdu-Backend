@@ -41,7 +41,15 @@ const crearMultiples = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
+const reporteAsistencia = async (req, res) => {
+  try {
+    const { cursoSeccion, periodo, mes } = req.body;
+    const data = await asistenciaService.obtenerReportePorCursoPeriodoMes(cursoSeccion, periodo, mes);
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: "Error al obtener reporte" });
+  }
+};
 const obtenerPorFechaYCurso = async (req, res) => {
   try {
     const { cursoSeccion, fecha } = req.query;
@@ -82,7 +90,7 @@ module.exports = {
   insertar,
   listar,
   actualizar,obtenerPorFechaYCurso,
-  eliminar,
+  eliminar,reporteAsistencia,
   listarAuditoria,
   listarTodo,crearMultiples
 };
