@@ -138,6 +138,31 @@ async function obtenerSeccionesPorGradoPeriodo(grado,periodo) {
     throw err;
   }
 }
+
+async function obtenerSeccionesPeriodo(id) {
+
+     const sql = `
+       select s.id_seccion, s.nombre, 'Aula:'||' '|| a.numero_aula||'  -   '|| 'Nivel: '||' '||g.anio ||' '||g.nivel as seccion from tb_seccion s
+JOIN tb_grado g ON s.grado=g.id_grado
+JOIN tb_aula a ON s.aula=a.id_aula
+ JOIN tb_periodo_escolar p ON s.periodo=p.id_periodo
+WHERE p.id_periodo=$1  AND s.estado=true
+ORDER BY grado, nombre;
+    `;
+  
+  try {
+
+    const result =  await pool.query(sql, [
+      id
+    ]);
+ 
+    return result.rows;
+  } catch (err) {
+    console.error("❌ Error al obtener todos las secciones por un periodo:", err);
+    throw err;
+  }
+}
+
 // Obtener todas las secciones
 async function obtenerTodasLasSecciones() {
     const sql = `
@@ -282,7 +307,7 @@ async function eliminarSeccion(id, usuarioModificador) {
 
 module.exports = {
   insertarSeccion,
-  obtenerSecciones,
+  obtenerSecciones,obtenerSeccionesPeriodo,
   obtenerTodasLasSecciones,
   actualizarSeccion,
   eliminarSeccion,
