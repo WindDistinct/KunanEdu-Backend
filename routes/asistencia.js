@@ -10,7 +10,7 @@ router.get("/all-adm", listarTodo);
 router.get("/all-audit", listarAuditoria);
 router.get('/por-fecha', checkAuth, checkRol('profesor'), obtenerPorFechaYCurso);
 router.post('/multiple',checkAuth,checkRol('profesor'),crearMultiples);
-router.post("/reporte", checkAuth, checkRol('profesor'), reporteAsistencia);
+router.post("/reporte", checkAuth, checkRol('profesor', 'administrador'), reporteAsistencia);
 router.delete("/delete/:id",checkAuth,checkRol('administrador'),eliminar)
 router.put("/update/:id",checkAuth,checkRol('administrador'),actualizar)
 router.post("/create", checkAuth,checkRol('administrador'),insertar);
