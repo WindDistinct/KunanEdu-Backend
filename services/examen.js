@@ -91,6 +91,7 @@ async function obtenerNotasPorBimestre(aula, bimestre, cursoseccion) {
   const sql = `
   SELECT 
     n.nota,
+      x.id_examen,
       m.id_matricula,
       l.id_alumno,
       l.nombre || ' ' || l.apellido_paterno || ' ' || l.apellido_materno AS nombre_completo,
