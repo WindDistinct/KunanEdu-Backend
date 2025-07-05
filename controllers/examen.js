@@ -2,7 +2,7 @@ const examenService = require("../services/examen");
 
 const insertar = async (req, res) => {
   try {
-    const id = await examenService.insertarExamen(req.body,req.user);
+    const id = await examenService.insertarExamen(req.body, req.user);
     res.status(201).json({ mensaje: "Examen creado", id });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -25,6 +25,32 @@ const listarNotas = async (_req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const listarExamenes = async (req, res) => {
+  const { curso_seccion, bimestre } = req.params;
+
+  console.log("Params recibidos:", curso_seccion, bimestre);
+
+  if (!curso_seccion || !bimestre) {
+    return res.status(400).json({ error: "Faltan parámetros." });
+  }
+
+  try {
+    const examen = await examenService.obtenerExamenPorCursoYBimestre(
+      parseInt(curso_seccion),
+      bimestre
+    );
+
+    if (!examen) {
+      return res.status(404).json({ error: "Examen no encontrado" });
+    }
+
+    res.json(examen);
+  } catch (err) {
+    console.error("❌ Error interno:", err);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
+
 const listarTodo = async (_req, res) => {
   try {
     const examen = await examenService.obtenerTodosLosExamenes();
@@ -42,24 +68,24 @@ const crearMultiples = async (req, res) => {
   }
 };
 const listarNotasBimestre = async (req, res) => {
-   const { aula,bimestre,cursoseccion } = req.params;
-  
-    try {
-      const notas = await examenService.obtenerNotasPorBimestre(parseInt(aula),bimestre,parseInt(cursoseccion));
-      res.json(notas);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
+  const { aula, bimestre, cursoseccion } = req.params;
+
+  try {
+    const notas = await examenService.obtenerNotasPorBimestre(parseInt(aula), bimestre, parseInt(cursoseccion));
+    res.json(notas);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 const listarNotasCurso = async (req, res) => {
-   const { docente,periodo,cursoseccion } = req.params;
-  
-    try {
-      const notas = await examenService.obtenerNotasPorCurso(parseInt(docente),parseInt(periodo),parseInt(cursoseccion));
-      res.json(notas);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
+  const { docente, periodo, cursoseccion } = req.params;
+
+  try {
+    const notas = await examenService.obtenerNotasPorCurso(parseInt(docente), parseInt(periodo), parseInt(cursoseccion));
+    res.json(notas);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 const listarNotasAlumno = async (req, res) => {
   try {
@@ -79,7 +105,7 @@ const listarAuditoria = async (_req, res) => {
 };
 const actualizar = async (req, res) => {
   try {
-    const cambios = await examenService.actualizarExamen(req.params.id, req.body,req.user);
+    const cambios = await examenService.actualizarExamen(req.params.id, req.body, req.user);
     if (cambios === 0) return res.status(404).json({ error: "Examen no encontrado o sin cambios" });
     res.json({ mensaje: "Examen actualizado" });
   } catch (error) {
@@ -89,7 +115,7 @@ const actualizar = async (req, res) => {
 
 const eliminar = async (req, res) => {
   try {
-    const eliminado = await examenService.eliminarExamen(req.params.id,req.user);
+    const eliminado = await examenService.eliminarExamen(req.params.id, req.user);
     if (eliminado === 0) return res.status(404).json({ error: "Examen no encontrado" });
     res.json({ mensaje: "Examen eliminada correctamente" });
   } catch (error) {
@@ -98,12 +124,13 @@ const eliminar = async (req, res) => {
 };
 
 module.exports = {
+  listarExamenes,
   insertar,
   listarNotasCurso,
   listado,
   listarAuditoria,
-  actualizar, 
+  actualizar,
   listarNotas,
   listarNotasAlumno,
-  eliminar,listarTodo,crearMultiples,listarNotasBimestre
+  eliminar, listarTodo, crearMultiples, listarNotasBimestre
 };

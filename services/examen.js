@@ -347,6 +347,25 @@ async function eliminarExamen(id, usuarioModificador) {
   }
 }
 
+async function obtenerExamenPorCursoYBimestre(curso_seccion, bimestre) {
+  const sql = `
+    SELECT id_examen
+    FROM tb_examen
+    WHERE curso_seccion = $1
+      AND bimestre = $2
+      AND estado = true
+    LIMIT 1
+  `;
+
+  try {
+    const result = await pool.query(sql, [curso_seccion, bimestre]);
+    return result.rows[0]; // { id_examen: ... } o undefined
+  } catch (err) {
+    console.error("❌ Error al obtener examen por curso y bimestre:", err);
+    throw err;
+  }
+}
+
 module.exports = {
   insertarExamen,
   obtenerNotasPorCurso,
@@ -355,6 +374,7 @@ module.exports = {
   obtenerTodosLosExamenes,
   actualizarExamen, insertarMultiplesNotas,
   eliminarExamen,
+  obtenerExamenPorCursoYBimestre,
   obtenerExamenesAlumno,
   obtenerTodosLosExamenesAuditoria
 };
