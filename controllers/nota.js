@@ -69,6 +69,17 @@ const generar = async (req, res) => {
     }
 };
 
+async function getHistorial(req, res) {
+    const { id } = req.params;
+    try {
+        const historial = await obtenerHistorialAcademicoPorAlumno(id);
+        res.json(historial);
+    } catch (error) {
+        console.error('Error al obtener historial académico:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+};
+
 module.exports = {
     crear,
     listar,
@@ -76,5 +87,6 @@ module.exports = {
     eliminar,
     listarTodo,
     generar,
+    getHistorial
     // listarAuditoria
 };
