@@ -51,6 +51,18 @@ const listarAlumnosPorPeriodo = async (req, res) => {
   }
 };
 
+const buscarPorNombre = async (req, res) => {
+  try {
+    const { nombre } = req.query;
+    if (!nombre) return res.status(400).json({ mensaje: "Parámetro 'nombre' requerido" });
+
+    const resultados = await alumnoService.buscarAlumnosPorNombre(nombre);
+    res.json(resultados);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const insertar = async (req, res) => {
   try {
     const id = await estudianteService.insertarAlumno(req.body, req.user);
@@ -92,5 +104,6 @@ module.exports = {
   insertar,
   listarAuditoria,
   listarTodo,
-  listarAlumnosPorPeriodo // ✅ exportado
+  buscarPorNombre,
+  listarAlumnosPorPeriodo
 };

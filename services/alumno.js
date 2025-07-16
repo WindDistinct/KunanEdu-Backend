@@ -10,10 +10,10 @@ async function registrarAuditoriaAlumno({
   direccion_anterior, direccion_nuevo,
   telefono_anterior, telefono_nuevo,
   fecha_nacimiento_anterior, fecha_nacimiento_nuevo,
-  estado_anterior, estado_nuevo,observacion,
+  estado_anterior, estado_nuevo, observacion,
   operacion, usuario
 }) {
-  const fecha = new Date(); 
+  const fecha = new Date();
 
   const sqlAudit = `
     INSERT INTO tb_audit_alumno (
@@ -56,11 +56,34 @@ async function registrarAuditoriaAlumno({
   }
 }
 
+async function buscarAlumnosPorNombre(nombreBusqueda) {
+  const sql = `
+    SELECT *
+    FROM tb_alumno
+    WHERE estado = true
+      AND (
+        LOWER(nombre) LIKE LOWER($1)
+        OR LOWER(apellido_paterno) LIKE LOWER($1)
+        OR LOWER(apellido_materno) LIKE LOWER($1)
+      )
+  `;
+
+  const valorBusqueda = `%${nombreBusqueda}%`;
+
+  try {
+    const result = await pool.query(sql, [valorBusqueda]);
+    return result.rows;
+  } catch (err) {
+    console.error("❌ Error al buscar alumnos por nombre:", err);
+    throw err;
+  }
+}
+
 // Insertar alumno
 async function insertarAlumno(datos, usuarioModificador) {
   const {
     nombre, apellido_paterno, apellido_materno,
-    tipo_documento,numero_documento, direccion, telefono, fecha_nacimiento
+    tipo_documento, numero_documento, direccion, telefono, fecha_nacimiento
   } = datos;
 
   const sqlInsert = `
@@ -76,7 +99,7 @@ async function insertarAlumno(datos, usuarioModificador) {
   try {
     const result = await pool.query(sqlInsert, [
       nombre, apellido_paterno, apellido_materno,
-      tipo_documento,numero_documento, direccion, telefono, fecha_nacimiento
+      tipo_documento, numero_documento, direccion, telefono, fecha_nacimiento
     ]);
     const id_alumno = result.rows[0].id_alumno;
 
@@ -98,7 +121,7 @@ async function insertarAlumno(datos, usuarioModificador) {
       fecha_nacimiento_nuevo: fecha_nacimiento,
       estado_anterior: null,
       estado_nuevo: true,
-      observacion:'Nuevo registro',
+      observacion: 'Nuevo registro',
       operacion: 'INSERT',
       usuario: usuarioModificador.usuario
     });
@@ -121,8 +144,8 @@ async function obtenerAlumnos() {
     throw err;
   }
 }
-async function obtenerAlumnosAula(aula,cursoseccion) {
-   const sql = `
+async function obtenerAlumnosAula(aula, cursoseccion) {
+  const sql = `
   select d.id_curso_seccion, c.nombre_curso,s.nombre ||' '||g.anio as seccion,m.id_matricula,l.id_alumno,l.nombre ||' '||l.apellido_paterno||' '||l.apellido_materno  as nombre_completo ,a.numero_aula as numero_aula, s.nombre ||' '|| g.anio ||' '||g.nivel as seccion, p.anio as periodo from tb_matricula m
    JOIN tb_seccion s ON m.seccion=s.id_seccion
       JOIN tb_curso_seccion d ON s.id_seccion=d.seccion
@@ -134,7 +157,7 @@ async function obtenerAlumnosAula(aula,cursoseccion) {
     WHERE m.condicion='Matriculado' AND a.numero_aula=$1 AND d.id_curso_seccion=$2 AND s.estado=true 
   `;
   try {
-    const result = await pool.query(sql, [aula,cursoseccion]);
+    const result = await pool.query(sql, [aula, cursoseccion]);
     return result.rows;
   } catch (err) {
     console.error("❌ Error al obtener los alumnos:", err);
@@ -150,7 +173,7 @@ async function obtenerAlumnosPorPeriodo(idPeriodo) {
     FROM tb_alumno a
     JOIN tb_matricula m ON a.id_alumno = m.alumno
     JOIN tb_seccion s ON m.seccion = s.id_seccion
-    WHERE s.periodo = $1 AND m.condicion = 'Matriculado'
+    WHERE s.periodo = $1 AND m.condicion = 'Matriculado' AND a.estado = true
   `;
   try {
     const result = await pool.query(sql, [idPeriodo]);
@@ -190,7 +213,7 @@ async function obtenerTodosLosAlumnosAudit() {
 async function actualizarAlumno(id, datos, usuarioModificador) {
   const {
     nombre, apellido_paterno, apellido_materno,
-    tipo_documento,numero_documento, direccion, telefono, fecha_nacimiento, estado,observacion
+    tipo_documento, numero_documento, direccion, telefono, fecha_nacimiento, estado, observacion
   } = datos;
 
   try {
@@ -215,7 +238,7 @@ async function actualizarAlumno(id, datos, usuarioModificador) {
 
     await pool.query(sqlUpdate, [
       nombre, apellido_paterno, apellido_materno,
-      tipo_documento, numero_documento,direccion, telefono, fecha_nacimiento,
+      tipo_documento, numero_documento, direccion, telefono, fecha_nacimiento,
       estado, id
     ]);
 
@@ -237,7 +260,7 @@ async function actualizarAlumno(id, datos, usuarioModificador) {
       fecha_nacimiento_nuevo: fecha_nacimiento,
       estado_anterior: anterior.estado,
       estado_nuevo: estado,
-       observacion: observacion,
+      observacion: observacion,
       operacion: 'UPDATE',
       usuario: usuarioModificador.usuario
     });
@@ -286,7 +309,7 @@ async function eliminarAlumno(id, usuarioModificador) {
       fecha_nacimiento_nuevo: anterior.fecha_nacimiento,
       estado_anterior: anterior.estado,
       estado_nuevo: false,
-      observacion:'Registro eliminado',
+      observacion: 'Registro eliminado',
       operacion: 'DELETE',
       usuario: usuarioModificador.usuario
     });
@@ -305,6 +328,7 @@ module.exports = {
   actualizarAlumno,
   eliminarAlumno,
   obtenerAlumnosAula,
-  obtenerTodosLosAlumnosAudit, 
-   obtenerAlumnosPorPeriodo
+  obtenerTodosLosAlumnosAudit,
+  obtenerAlumnosPorPeriodo,
+  buscarAlumnosPorNombre
 };

@@ -10,7 +10,7 @@ async function registrarAuditoriaAula({
   observacion,
   operacion, usuario
 }) {
- const fecha = new Date(); 
+  const fecha = new Date();
 
   const sqlAudit = `
     INSERT INTO tb_audit_aula (
@@ -27,7 +27,7 @@ async function registrarAuditoriaAula({
     numero_anterior, numero_nuevo,
     aforo_anterior, aforo_nuevo,
     ubicacion_anterior, ubicacion_nueva,
-    estado_anterior, estado_nuevo,observacion,
+    estado_anterior, estado_nuevo, observacion,
     operacion, fecha, usuario
   ];
 
@@ -43,12 +43,12 @@ async function registrarAuditoriaAula({
 
 // Insertar aula
 async function insertarAula(datos, usuarioModificador) {
-    const { numero_aula, aforo, ubicacion } = datos;
- 
+  const { numero_aula, aforo, ubicacion } = datos;
+
   const sqlCheck = `SELECT 1 FROM tb_aula WHERE numero_aula = $1`;
   const checkResult = await pool.query(sqlCheck, [numero_aula]);
 
-  if (checkResult.rowCount > 0) { 
+  if (checkResult.rowCount > 0) {
     throw new Error("El número de aula ya existe");
   }
 
@@ -74,7 +74,7 @@ async function insertarAula(datos, usuarioModificador) {
       ubicacion_nueva: ubicacion,
       estado_anterior: null,
       estado_nuevo: true,
-       observacion:'Nuevo registro',
+      observacion: 'Nuevo registro',
       operacion: 'INSERT',
       usuario: usuarioModificador.usuario
     });
@@ -124,9 +124,9 @@ async function obtenerTodasLasAulasAudit() {
 
 // Actualizar aula
 async function actualizarAula(id, datos, usuarioModificador) {
-  const { numero_aula, aforo, ubicacion, estado,observacion } = datos;
+  const { numero_aula, aforo, ubicacion, estado, observacion } = datos;
 
-  try { 
+  try {
     const resultAnterior = await pool.query(
       "SELECT * FROM tb_aula WHERE id_aula = $1",
       [id]
@@ -135,7 +135,7 @@ async function actualizarAula(id, datos, usuarioModificador) {
     if (resultAnterior.rowCount === 0) {
       throw new Error("Aula no encontrada");
     }
- 
+
     const duplicado = await pool.query(
       "SELECT id_aula FROM tb_aula WHERE numero_aula = $1 AND id_aula <> $2",
       [numero_aula, id]
@@ -167,12 +167,12 @@ async function actualizarAula(id, datos, usuarioModificador) {
       ubicacion_nueva: ubicacion,
       estado_anterior: anterior.estado,
       estado_nuevo: estado,
-      observacion:observacion,
+      observacion: observacion,
       operacion: 'UPDATE',
       usuario: usuarioModificador.usuario
     });
 
-    return { mensaje: "Aula actualizada y auditada",datos };
+    return { mensaje: "Aula actualizada y auditada", datos };
   } catch (err) {
     console.error("❌ Error al actualizar aula:", err);
     throw err;
@@ -208,7 +208,7 @@ async function eliminarAula(id, usuarioModificador) {
       ubicacion_nueva: anterior.ubicacion,
       estado_anterior: anterior.estado,
       estado_nuevo: false,
-       observacion:'Registro eliminado',
+      observacion: 'Registro eliminado',
       operacion: 'DELETE',
       usuario: usuarioModificador.usuario
     });

@@ -8,12 +8,14 @@ const {
   insertar,
   listarTodo,
   listarAuditoria,
+  buscarPorNombre,
   listarAlumnosPorPeriodo // ✅ Importación del nuevo controlador
 } = require("../controllers/alumno");
 
 const checkAuth = require("../middleware/session");
 const checkRol = require("../middleware/rol");
- 
+
+router.get('/buscar', buscarPorNombre);
 
 // 1. Rutas POST primero
 router.post("/create", checkAuth, checkRol("administrador"), insertar);
@@ -26,7 +28,7 @@ router.delete("/delete/:id", checkAuth, checkRol("administrador"), eliminar);
 
 // 4. Rutas GET más específicas primero 
 router.get("/alumnos-aula/:aula/:cursoseccion", listarAlumnoAula);
-router.get("/por-periodo/:idPeriodo", listarAlumnosPorPeriodo);  
+router.get("/por-periodo/:idPeriodo", listarAlumnosPorPeriodo);
 router.get("/all", listado);
 router.get("/all-adm", listarTodo);
 router.get("/all-audit", listarAuditoria);

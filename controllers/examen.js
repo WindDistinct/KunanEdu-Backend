@@ -67,6 +67,7 @@ const crearMultiples = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 const listarNotasBimestre = async (req, res) => {
   const { aula, bimestre, cursoseccion } = req.params;
 
