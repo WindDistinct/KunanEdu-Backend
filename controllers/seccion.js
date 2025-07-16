@@ -25,6 +25,14 @@ const listarTodo = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const listarPorPeriodo = async (req, res) => {
+  try {
+    const seccion = await seccionService.obtenerSeccionesPeriodo(req.params.id);
+    res.json(seccion);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 const listarSeccionesGradoPeriodo = async (req, res) => {
    const { grado,periodo } = req.params;
   
@@ -43,6 +51,7 @@ const listarAuditoria = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 const actualizar = async (req, res) => {
   try {
     const cambios = await seccionService.actualizarSeccion(req.params.id, req.body,req.user);
@@ -69,6 +78,6 @@ module.exports = {
   actualizar,
   eliminar,
   listarSeccionesGradoPeriodo,
-  listarTodo,
+  listarTodo,listarPorPeriodo,
   listarAuditoria
 };

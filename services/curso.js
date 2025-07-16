@@ -67,6 +67,30 @@ async function obtenerTodosLosCursosAuditoria() {
     throw err;
   }
 }
+
+async function obtenerCursosPorSeccion(id) {
+
+     const sql = `
+      SELECT cs.id_curso_seccion, c.nombre_curso
+    FROM tb_curso_seccion cs
+    JOIN tb_curso c ON cs.curso = c.id_curso
+    WHERE cs.seccion = $1 AND cs.estado = true
+    ORDER BY c.nombre_curso;
+    `;
+  
+  try {
+
+    const result =  await pool.query(sql, [
+      id
+    ]);
+ 
+    return result.rows;
+  } catch (err) {
+    console.error("❌ Error al obtener todos las secciones por un periodo:", err);
+    throw err;
+  }
+}
+
 // Insertar curso
 async function insertarCurso(datos, usuarioModificador) {
   const { nombre_curso } = datos;
@@ -200,7 +224,7 @@ async function eliminarCurso(id, usuarioModificador) {
 module.exports = {
   obtenerCursos,
   obtenerTodosLosCursos,
-  insertarCurso,
+  insertarCurso,obtenerCursosPorSeccion,
   obtenerTodosLosCursosAuditoria,
   actualizarCurso,
   eliminarCurso
