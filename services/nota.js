@@ -176,8 +176,68 @@ async function generarReporte(periodo, alumnoId) {
         console.error("❌ Error al generar el reporte:", err);
         throw err;
     }
-}
+};
 
+async function obtenerHistorialAcademicoPorAlumno(idAlumno) {
+    const query = `
+    SELECT
+      p.anio,
+      p.descripcion,
+      p.progreso,
+      c.nombre_curso,
+      e.bimestre,
+      ROUND(AVG(n.nota)::numeric, 2) AS promedio
+    FROM tb_nota n
+    JOIN tb_examen e ON n.id_examen = e.id_examen
+    JOIN tb_curso_seccion cs ON e.curso_seccion = cs.id_curso_seccion
+    JOIN tb_curso c ON cs.curso = c.id_curso
+    JOIN tb_matricula m ON n.id_matricula = m.id_matricula
+    JOIN tb_seccion s ON m.seccion = s.id_seccion
+    JOIN tb_periodo_escolar p ON s.periodo = p.id_periodo
+    WHERE m.alumno = $1
+      AND n.estado IS TRUE
+    GROUP BY p.anio, p.descripcion, p.progreso, c.nombre_curso, e.bimestre
+    ORDER BY p.anio DESC, c.nombre_curso, e.bimestre;
+  `;
+
+    const { rows } = await pool.query(query, [idAlumno]);
+
+    // Agrupar resultados
+    const resultado = [];
+    for (const row of rows) {
+        let periodo = resultado.find(r =>
+            r.anio === row.anio &&
+            r.descripcion === row.descripcion &&
+            r.progreso === row.progreso
+        );
+
+        if (!periodo) {
+            periodo = {
+                anio: row.anio,
+                descripcion: row.descripcion,
+                progreso: row.progreso,
+                cursos: []
+            };
+            resultado.push(periodo);
+        }
+
+        let curso = periodo.cursos.find(c => c.nombre_curso === row.nombre_curso);
+        if (!curso) {
+            curso = {
+                nombre_curso: row.nombre_curso,
+                bimestres: []
+            };
+            periodo.cursos.push(curso);
+        }
+
+        curso.bimestres.push({
+            bimestre: row.bimestre,
+            promedio: parseFloat(row.promedio)
+        });
+    }
+
+    return resultado;
+}
 
 module.exports = {
     insertarNota,
@@ -186,5 +246,6 @@ module.exports = {
     // obtenerTodasLasNotasAudit,
     obtenerTodasLasNotas,
     actualizarNota,
-    eliminarNota
+    eliminarNota,
+    obtenerHistorialAcademicoPorAlumno
 };

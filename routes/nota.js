@@ -6,8 +6,9 @@ const {
   eliminar,
   crear,
   listarTodo,
-  // listarAuditoria, // Puedes descomentar si lo necesitas luego
-  generar
+  // listarAuditoria,
+  generar,
+  getHistorial
 } = require("../controllers/nota");
 
 const checkAuth = require("../middleware/session");
@@ -19,8 +20,7 @@ router.get("/all-adm", listarTodo);
 router.delete("/delete/:id", checkAuth, checkRol('administrador'), eliminar);
 router.put("/update/:id", actualizar);
 router.post("/create", checkAuth, checkRol('profesor'), crear);
-
-// ✅ Cambiado: solo acepta periodo y alumno
+router.get("/historial/:id", getHistorial);
 router.get("/generar-reporte/:periodo/:alumno", generar);
 
 module.exports = router;
