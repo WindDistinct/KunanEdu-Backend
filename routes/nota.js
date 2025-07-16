@@ -19,7 +19,7 @@ router.get("/all-adm", listarTodo);
 // router.get("/all-audit", listarAuditoria);
 router.delete("/delete/:id", checkAuth, checkRol('administrador'), eliminar);
 router.put("/update/:id", actualizar);
-router.post("/create", checkAuth, checkRol('profesor'), crear);
+router.post("/create", checkAuth, checkRol('profesor', 'administrador'), crear);
 router.get("/historial/:id", getHistorial);
 router.get("/generar-reporte/:periodo/:alumno", generar);
 
