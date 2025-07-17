@@ -72,7 +72,7 @@ const generar = async (req, res) => {
 async function getHistorial(req, res) {
     const { id } = req.params;
     try {
-        const historial = await obtenerHistorialAcademicoPorAlumno(id);
+        const historial = await notaService.obtenerHistorialAcademicoPorAlumno(id);
         res.json(historial);
     } catch (error) {
         console.error('Error al obtener historial académico:', error);
